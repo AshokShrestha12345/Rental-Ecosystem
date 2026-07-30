@@ -1,0 +1,150 @@
+/* ========================
+   FIND HOME CTA SECTION
+======================== */
+
+.find-home-section {
+    padding: 80px 70px;
+    background: linear-gradient(135deg, #0f2460 0%, #1E3A8A 45%, #2563EB 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.find-home-section::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: -80px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.find-home-section::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    right: 420px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Content side */
+.find-home-content {
+    flex: 1;
+    z-index: 1;
+    max-width: 560px;
+}
+
+/* Eyebrow badge — must stay CSS (::before) */
+
+.find-home-content h2 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    color: #fff;
+    text-align: left;
+    letter-spacing: -0.02em;
+}
+
+.find-home-content p {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    text-align: left;
+}
+
+/* Buttons */
+.find-home-buttons {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.find-home-buttons button {
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    letter-spacing: 0.01em;
+    border: none;
+}
+
+.find-home-buttons button:first-child {
+    background: #fff;
+    color: #1E3A8A;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.find-home-buttons button:first-child:hover {
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.find-home-buttons button:last-child {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(8px);
+}
+
+.find-home-buttons button:last-child span {
+    color: #fff;
+}
+
+.find-home-buttons button:last-child:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.6);
+    transform: translateY(-3px);
+}
+
+.find-home-buttons button i {
+    font-size: 1rem;
+}
+
+/* Image side */
+.find-home-image {
+    flex-shrink: 0;
+    width: 420px;
+    height: 340px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Glow behind image — must stay CSS (::before) */
+.find-home-image::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(59,130,246,0.2));
+    border-radius: 20px;
+    filter: blur(20px);
+    z-index: -1;
+}
+
+.find-home-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.12);
+}

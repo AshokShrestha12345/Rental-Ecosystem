@@ -1,0 +1,727 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEase — Owner Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <!-- FA before Tailwind to prevent preflight breaking icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E3A8A',
+            'primary-light': '#3B82F6',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            surface: '#FFFFFF',
+            'text-primary': '#111827',
+            'text-secondary': '#6B7280',
+            'text-muted': '#9CA3AF',
+            border: '#E5E7EB',
+            bg: '#F3F4F8',
+          },
+          spacing: { 'sidebar-w': '260px' },
+          fontFamily: {
+            playfair: ['"Playfair Display"', 'serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Restore font-style after Tailwind preflight -->
+  <style>
+    i {
+      font-style: normal;
+    }
+  </style>
+  <link rel="stylesheet" href="{% static 'css/pages/owner.css' %}">
+</head>
+
+<body class="h-full font-sans bg-bg text-text-primary overflow-hidden">
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside id="sidebar"
+      class="flex flex-col w-sidebar-w bg-primary overflow-y-auto overflow-x-hidden relative z-50 flex-shrink-0 sidebar hidden md:flex">
+
+      <!-- Logo -->
+      <a href="{% url 'home' %}"
+        class="p-[24px_20px_20px] flex items-center gap-2.5 border-b border-white/10 hover:bg-white/5 transition-all">
+        <div class="w-9 h-9 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-house text-black text-base"></i>
+        </div>
+        <div class="font-playfair text-xl font-bold text-white">
+          Rent<span class="text-accent">Ease</span>
+        </div>
+      </a>
+
+      <!-- Owner info -->
+      <div class="px-5 py-4 flex items-center gap-3 border-b border-white/10">
+        <div class="owner-avatar"> {{ user_info.first_name|slice:":1"|upper }} </div>
+        <div class="owner-info">
+          <div class="name"> {{user_info.first_name}} {{user_info.last_name}} </div>
+          <div class="role">Property Owner</div>
+        </div>
+        <div class="verified-badge">
+          <i class="fa-solid fa-check"></i> Verified
+        </div>
+      </div>
+
+      <!-- Nav: Main -->
+      <div class="py-3 nav-section">
+        <div class="nav-label">Main</div>
+        <div class="nav-item active" data-panel="dashboard">
+          <div class="nav-icon"><i class="fa-solid fa-chart-bar"></i></div>
+          <div class="nav-text">Dashboard</div>
+        </div>
+        <div class="nav-item" data-panel="add-property">
+          <div class="nav-icon"><i class="fa-solid fa-plus"></i></div>
+          <div class="nav-text">Add Property</div>
+        </div>
+        <div class="nav-item" data-panel="my-properties">
+          <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+          <div class="nav-text">My Properties</div>
+        </div>
+        <div class="nav-item" data-panel="bookings">
+          <div class="nav-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+          <div class="nav-text">Booking Requests</div>
+
+          {% if is_verified_by_admin %}
+          {% if pending_bookings_count > 0 %}
+          <div class="nav-badge">{{ pending_bookings_count }}</div>
+          {% else %}
+          <div class="nav-badge"></div>
+          {% endif %}
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Nav: Experience -->
+      <div class="nav-section">
+        <div class="nav-label">Experience</div>
+
+        <div class="nav-item" data-panel="reviews">
+          <div class="nav-icon"><i class="fa-solid fa-star"></i></div>
+          <div class="nav-text">Reviews</div>
+        </div>
+
+      </div>
+
+      <!-- Nav: Account -->
+      <div class="nav-section">
+        <div class="nav-label">Account</div>
+        <div class="nav-item" data-panel="profile">
+          <div class="nav-icon"><i class="fa-solid fa-user"></i></div>
+          <div class="nav-text">Profile Settings</div>
+        </div>
+        <div class="nav-item" data-panel="notifications">
+          <div class="nav-icon"><i class="fa-solid fa-bell"></i></div>
+          <div class="nav-text">Notifications</div>
+          {% if unread_notifications_count > 0 %}
+          <div class="nav-badge">{{ unread_notifications_count }}</div>
+          {% endif %}
+        </div>
+        <div class="nav-item" data-panel="support">
+          <div class="nav-icon"><i class="fa-solid fa-headset"></i></div>
+          <div class="nav-text">Support / Report</div>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <div class="sidebar-footer">
+        <a href="{% url 'home' %}" class="logout-btn flex items-center gap-2.5">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Log Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+      <!-- Topbar -->
+      <div class="bg-surface border-b border-border h-[60px] px-7 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-3">
+
+          <div>
+            <h2 id="topbar-title" class="font-playfair text-xl font-bold">Dashboard</h2>
+            <p id="topbar-sub" class="text-xs text-text-muted mt-0.5">Welcome back, {{ user_info.first_name }}! Here's
+              your property overview.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="top-btn ghost hidden md:block" data-nav="my-properties">
+            <i class="fa-solid fa-house"></i> My Properties
+          </button>
+          <button class="top-btn primary hidden md:block" data-nav="add-property">
+            <i class="fa-solid fa-plus"></i> Add Property
+          </button>
+
+          <button class="notif-btn" data-nav="notifications">
+            <i class="fa-solid fa-bell"></i>
+            {% if unread_notifications_count > 0 %}
+            <div class="notif-dot"></div>
+            {% endif %}
+          </button>
+
+          <button class="mobile-menu-btn md:hidden" id="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto p-6 content">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <div class="panel active " id="panel-dashboard">
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 w-full h-full">
+
+            <!-- Stat cards -->
+            <div class="col-span-2 md:col-span-1 text-center md:text-left text-xl md:text-sm flex flex-col gap-2 mb-6">
+              <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fa-solid fa-house"></i></div>
+                <div class="stat-val">{{ total_properties }}</div>
+                <div class="stat-label">Total Properties</div>
+              </div>
+              <div class="stat-card gold">
+                <div class="stat-icon gold"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="stat-val">{{ active_listings }}</div>
+                <div class="stat-label">Active Listings</div>
+              </div>
+              <div class="stat-card red">
+                <div class="stat-icon red"><i class="fa-solid fa-key"></i></div>
+                <div class="stat-val">{{ booked_properties }}</div>
+                <div class="stat-label">Booked / Occupied</div>
+              </div>
+            </div>
+
+
+
+            <!-- Dash grid -->
+            <div class="flex-1 flex flex-col col-span-3 gap-4 mb-6 w-full h-full">
+
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title"><i class="fa-solid fa-bell mr-1"></i> Recent Activity</span>
+                </div>
+                <div class="card-body">
+                  <div class="activity-list">
+                    {% for notification in notifications|slice:":5" %}
+                    <div class="activity-item">
+                      <div class="activity-dot {% if notification.is_read %}blue{% else %}green{% endif %}"></div>
+                      <div class="activity-text">{{ notification.message }}<span>{{ notification.from_user.first_name }}
+                          {{ notification.from_user.last_name }} • {{ notification.created_at|timesince }} ago</span>
+                      </div>
+                    </div>
+                    {% empty %}
+                    <div class="activity-item">
+                      <div class="activity-dot blue"></div>
+                      <div class="activity-text">No recent activity yet.<span>Your activity will appear here.</span>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="fa-solid fa-house mr-1"></i> Quick Property Overview</span>
+              <span class="card-action" data-nav="my-properties">View All</span>
+            </div>
+            <div class="card-body">
+              <div class="quick-props">
+                {% for room in rooms|slice:":4" %}
+                <div class="qprop">
+                  <div class="qprop-img">
+                    {% if room.image %}
+                    <img src="{{ room.image.url }}" alt="{{ room.room_name }}"
+                      style="width:40px;height:40px;border-radius:8px;object-fit:cover;" />
+                    {% else %}
+                    <i class="fa-solid fa-building text-xl text-primary-light"></i>
+                    {% endif %}
+                  </div>
+                  <div class="qprop-info">
+                    <div class="qprop-name">{{ room.room_name }}</div>
+                    <div class="qprop-loc"><i class="fa-solid fa-location-dot"></i> {{ room.address }}, {{ room.city }}
+                    </div>
+                  </div>
+                  <div class="text-[13px] font-bold text-primary">Rs.{{ room.price }}</div>
+                  {% if room.is_occupied %}
+                  <div class="qprop-status booked">Booked</div>
+                  {% else %}
+                  <div class="qprop-status available">Available</div>
+                  {% endif %}
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);text-align:center;padding:1.5rem;">No properties listed yet. Add your
+                  first property!</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ADD PROPERTY ═══ -->
+        <div class="panel" id="panel-add-property">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Add New Property</div>
+              <div class="section-subtitle">Fill in the details to list your property</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+
+              <form action="{% url 'create_property' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="form-group"><label class="form-label">Property Title <span class="req">*</span></label>
+                    <input name="room_name" class="form-input" placeholder="e.g. Modern 2BHK Flat in Thamel">
+                  </div>
+                  <div class="form-group"><label class="form-label">Additional Facilities <span
+                        class="req">*</span></label>
+                    <select name="additional_facilities" class="form-select">
+                      <option value="">Select Facilities</option>
+                      <option>Attached Bathroom</option>
+                      <option>Furnished</option>
+                      <option>Parking</option>
+                      <option>WiFi</option>
+                      <option>Security</option>
+                      <option>Water Supply</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label class="form-label">Location / Address <span
+                        class="req">*</span></label>
+                    <input name="address" class="form-input" placeholder="Street, Tole, Ward No.">
+                  </div>
+                  <div class="form-group"><label class="form-label">City</label>
+                    <select name="city" class="form-select">
+                      <option>Kathmandu</option>
+                      <option>Lalitpur</option>
+                      <option>Bhaktapur</option>
+                      <option>Pokhara</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label class="form-label">Monthly Rent (NPR) <span
+                        class="req">*</span></label>
+                    <input name="price" class="form-input" type="number" placeholder="e.g. 35000">
+                  </div>
+                  <div class="form-group"><label class="form-label">Size(sqft)</label>
+                    <input name="size" class="form-input" type="number" placeholder="450sqft">
+                  </div>
+                  <div class="form-group"><label class="form-label">Bedrooms</label>
+                    <select name="bedrooms" class="form-select">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4+</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label class="form-label">Bathrooms</label>
+                    <select name="bathrooms" class="form-select">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-span-2"><label class="form-label">Description <span
+                        class="req">*</span></label><textarea name="description" class="form-textarea"
+                      placeholder="Describe your property — location benefits, nearby amenities, condition, rules..."></textarea>
+                  </div>
+                  <div class="form-group col-span-2">
+                    <label class="form-label">Property Photo</label>
+                    <input type="file" name="image" accept="image/*" class="form-input">
+                  </div>
+
+                </div>
+                <div class="submit-bar">
+                  <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Publish
+                    Listing</button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ MY PROPERTIES ═══ -->
+        <div class="panel" id="panel-my-properties">
+          <div class="section-header">
+            <div>
+              <div class="section-title">My Properties</div>
+              <div class="section-subtitle">Manage all your listed properties</div>
+            </div>
+            <button class="btn btn-primary" data-nav="add-property"><i class="fa-solid fa-plus"></i> Add New</button>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn active">All </button>
+            <button class="filter-btn">Available</button>
+            <button class="filter-btn">Booked </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            {% for room in rooms %}
+            <article class="prop-card">
+              <div class="prop-card-img" style="background:linear-gradient(135deg,#1E3A8A,#3B82F6)">
+                {% if room.image %}
+                <img src="{{ room.image.url }}" alt="{{ room.room_name }}" class="w-full h-full object-cover" />
+                {% else %}
+                <i class="fa-solid fa-building text-[44px] text-white/60"></i>
+                {% endif %}
+                <span class="prop-card-badge {% if room.tag == 'Verified' %}verified{% else %}pending{% endif %}">
+                  {% if room.tag == 'Verified' %}
+                  <i class="fa-solid fa-check"></i> Verified
+                  {% else %}
+                  <i class="fa-solid fa-clock"></i> {{ room.tag }}
+                  {% endif %}
+                </span>
+              </div>
+              <div class="prop-card-body">
+                <h3 class="prop-card-title">{{ room.room_name }}</h3>
+                <p class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> {{ room.address }}, {{ room.city }}
+                </p>
+                <ul class="prop-card-meta">
+                  <li class="prop-meta-item"><i class="fa-solid fa-bed"></i> {{ room.beds }} Beds</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-shower"></i> {{ room.bath }} Baths</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-ruler-combined"></i> {{ room.sqft }} sqft</li>
+                </ul>
+                <div class="prop-card-footer flex justify-between items-center">
+                  <strong class="prop-price">Rs. {{ room.price }}<span>/mo</span></strong>
+                  {% if room.is_occupied %}
+                  <span class="qprop-status booked" style="font-size:11px;">Occupied</span>
+                  {% else %}
+                  <span class="qprop-status available" style="font-size:11px;">Available</span>
+                  {% endif %}
+                </div>
+
+              </div>
+            </article>
+            {% empty %}
+            <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem;">No properties listed
+              yet.</p>
+            {% endfor %}
+
+
+          </div>
+        </div>
+
+        <!-- ═══ BOOKING REQUESTS ═══ -->
+        <div class="panel" id="panel-bookings">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Booking Requests</div>
+              <div class="section-subtitle">{{ pending_bookings_count }} pending request
+                {{ pending_bookings_count|pluralize }} need{{ pending_bookings_count|pluralize:",s" }} your attention
+              </div>
+            </div>
+          </div>
+          <div class="filter-bar ">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Pending">Pending ({{ pending_bookings_count }})</button>
+            <button class="filter-btn" data-filter="Approved">Accepted</button>
+            <button class="filter-btn" data-filter="Rejected">Rejected</button>
+          </div>
+          <div class="bookings-list">
+
+            {% for booking in bookings %}
+            {% if booking.is_verified_by_admin %}
+            <div class="booking-card flex flex-col md:flex-row " data-status="{{ booking.status }}">
+              <div class="booking-avatar"><i class="fa-solid fa-user"></i></div>
+              <div class="booking-info text-center">
+                <div class="booking-name">{{ booking.email }}</div>
+                <div class="booking-prop"><i class="fa-solid fa-house"></i> {{ booking.room_id.room_name }} —
+                  {{ booking.room_id.city }} • Move-in: {{ booking.move_in_date|date:"M d, Y" }}</div>
+                <div class="booking-meta md:w-full text-center ">
+                  <div class="booking-meta-item"><i class="fa-solid fa-users"></i> {{ booking.occupants }}</div>
+                  <div class="booking-meta-item"><i class="fa-solid fa-calendar"></i> {{ booking.lease_duration }}</div>
+                  <div class="booking-meta-item"><i class="fa-solid fa-clock"></i> {{ booking.created_at|timesince }}
+                    ago</div>
+                </div>
+              </div>
+              <div
+                class="booking-status text-center w-full md:w-auto {% if booking.status == 'Pending' %}pending{% elif booking.status == 'Approved' %}accepted{% elif booking.status == 'Rejected' %}rejected{% endif %}">
+                {% if booking.status == 'Pending' %}
+                <i class="fa-solid fa-hourglass-half"></i> Pending
+                {% elif booking.status == 'Approved' %}
+                <i class="fa-solid fa-circle-check"></i> Accepted
+                {% elif booking.status == 'Rejected' %}
+                <i class="fa-solid fa-xmark"></i> Rejected
+                {% endif %}
+              </div>
+              <div class="booking-actions  bg-red text-center">
+                {% if booking.status == 'Pending' %}
+                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-success btn-sm"><i
+                    class="fa-solid fa-check"></i> Accept</a>
+                <a href="{% url 'update_booking_status' booking.id 'Rejected' %}" class="btn btn-danger btn-sm"><i
+                    class="fa-solid fa-xmark"></i> Reject</a>
+                {% elif booking.status == 'Approved' %}
+                <span class="text-xs text-text-muted"><i class="fa-solid fa-check-double"></i> Approved</span>
+                {% elif booking.status == 'Rejected' %}
+                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-outline btn-sm"><i
+                    class="fa-solid fa-rotate-left"></i> Reconsider</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+              <i class="fa-solid fa-clipboard-list" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
+              No booking requests yet.
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+        <!-- ═══ REVIEWS ═══ -->
+        <div class="panel" id="panel-reviews">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Reviews & Ratings</div>
+              <div class="section-subtitle">What tenants say about your properties</div>
+            </div>
+          </div>
+          <div class="reviews-summary">
+            <div class="review-big-score">
+              <div class="big-rating">{{ avg_rating }}</div>
+              <div class="stars-row">
+                {% for i in "12345" %}
+                {% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %} {% endfor %} </div>
+                  <div class="review-count">Based on {{ review_count }} review{{ review_count|pluralize }}</div>
+              </div>
+            </div>
+            <div class="reviews-list">
+              {% for review in reviews %}
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="review-avatar"><i class="fa-solid fa-user"></i></div>
+                  <div>
+                    <div class="review-name">{{ review.title }}</div>
+                    <div class="review-prop">{{ review.property_id.room_name }} — {{ review.property_id.city }}</div>
+                  </div>
+                  <div class="review-stars ml-auto">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %} {% endfor %} </div>
+                  </div>
+                  <div class="review-text">"{{ review.review }}"</div>
+                  <div class="review-date">{{ review.created_at|date:"F d, Y" }}</div>
+                </div>
+                {% empty %}
+                <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+                  <i class="fa-solid fa-star" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
+                  No reviews yet.
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- ═══ PROFILE ═══ -->
+            <div class="panel" id="panel-profile">
+              <div class="section-header">
+                <div>
+                  <div class="section-title">Profile Settings</div>
+                  <div class="section-subtitle">Manage your personal information</div>
+                </div>
+              </div>
+              <div class="grid md:grid-cols-[260px_1fr] gap-5">
+                <div>
+                  <div class="profile-card">
+                    <div class="profile-avatar-big"><i class="fa-solid fa-user text-3xl"></i>
+                      <div class="profile-change-photo"><i class="fa-solid fa-camera text-[10px]"></i></div>
+                    </div>
+                    <div class="profile-name"> {{user_info.first_name}} {{user_info.last_name}}</div>
+                    <div class="profile-email">{{user_info.email}}</div>
+                    <div class="profile-stats">
+                      <div>
+                        <div class="profile-stat-val">{{ total_properties }}</div>
+                        <div class="profile-stat-label">Properties</div>
+                      </div>
+                      <div>
+                        <div class="profile-stat-val">{{ avg_rating }}</div>
+                        <div class="profile-stat-label">Rating</div>
+                      </div>
+                      <div>
+                        <div class="profile-stat-val">{{ review_count }}</div>
+                        <div class="profile-stat-label">Reviews</div>
+                      </div>
+                    </div>
+                    <div class="profile-tags">
+                      <div class="profile-tag"><i class="fa-solid fa-circle-check"></i> Verified</div>
+                      <div class="profile-tag"><i class="fa-solid fa-house"></i> Owner</div>
+                      {% if avg_rating >= 4 %}
+                      <div class="profile-tag"><i class="fa-solid fa-star"></i> Top Rated</div>
+                      {% endif %}
+                      <div class="profile-tag">
+                        <i class="fa-solid fa-location-dot"></i> {{ user_info.city|default:"Kathmandu" }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-4">
+
+                  <form method="POST" action="/profile/">
+
+                    {% csrf_token %}
+
+                    {% if messages %}
+                    <div class="messages mb-4">
+                      {% for message in messages %}
+                      <div
+                        class="p-3 rounded mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ message }}
+                      </div>
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="profile-section">
+                      <h3 class="profile-section-header"><i class="fa-solid fa-user"></i> Personal Information</h3>
+                      <div class="profile-section-body">
+                        <div class="grid grid-cols-2 gap-3.5">
+                          <div class="form-group"><label class="form-label">First Name</label><input class="form-input"
+                              name="first_name" placeholder="{{user_info.first_name}}"></div>
+                          <div class="form-group"><label class="form-label">Last Name</label><input class="form-input"
+                              name="last_name" placeholder="{{user_info.last_name}}"></div>
+                          <div class="form-group"><label class="form-label">Email</label><input class="form-input"
+                              name="email" type="email" placeholder="{{user_info.email}}"></div>
+                          <div class="form-group"><label class="form-label">Phone</label><input class="form-input"
+                              name="phone" placeholder="{{user_info.phone}}"></div>
+                          <div class="form-group"><label class="form-label">City</label>
+                            <input class="form-input" name="city" placeholder="{{user_info.city}}">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Role</label>
+
+                            <span class="form-input uppercase font-bold">{{user_info.role}}</span>
+                          </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-floppy-disk"></i>
+                          Save
+                          Changes</button>
+
+                      </div>
+
+                    </div>
+                    <div class="profile-section">
+                      <h3 class="profile-section-header"><i class="fa-solid fa-lock"></i> Change Password</h3>
+                      <div class="profile-section-body">
+                        <div class="grid grid-cols-2 gap-3.5">
+                          <div class="form-group"><label class="form-label">New Password</label><input
+                              class="form-input" name="password" type="password" placeholder="Min 8 characters"></div>
+                          <div class="form-group"><label class="form-label">Confirm Password</label><input
+                              class="form-input" name="confirm_password" type="password" placeholder="Min 8 characters">
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm mt-3"><i class="fa-solid fa-lock"></i>
+                          Update
+                          Password</button>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- ═══ NOTIFICATIONS ═══ -->
+            <div class="panel" id="panel-notifications">
+              <div class="section-header">
+                <div>
+                  <div class="section-title">Notifications</div>
+                  <div class="section-subtitle">{{ unread_notifications_count }} unread notification
+                    {{ unread_notifications_count|pluralize }}</div>
+                </div>
+              </div>
+              <div class="bg-surface rounded-[14px] border border-border overflow-hidden">
+                <div class="notif-list">
+                  {% for notification in notifications %}
+                  <div class="notif-item {% if not notification.is_read %}unread{% endif %}">
+                    <div class="notif-icon-wrap booking"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div class="notif-content">
+                      <div class="notif-title">From: {{ notification.from_user.first_name }}
+                        {{ notification.from_user.last_name }}</div>
+                      <div class="notif-desc">{{ notification.message }}</div>
+                      <div class="notif-time">{{ notification.created_at|timesince }} ago</div>
+                    </div>
+                    {% if not notification.is_read %}
+                    <div class="notif-dot-badge"></div>
+                    {% endif %}
+                  </div>
+                  {% empty %}
+                  <div class="notif-item">
+                    <div class="notif-icon-wrap booking"><i class="fa-solid fa-bell-slash"></i></div>
+                    <div class="notif-content">
+                      <div class="notif-title">No notifications</div>
+                      <div class="notif-desc">You're all caught up! New notifications will appear here.</div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══ SUPPORT ═══ -->
+            <div class="panel" id="panel-support">
+              <div class="section-header">
+                <div>
+                  <div class="section-title">Support & Report</div>
+                  <div class="section-subtitle">We're here to help — contact our team anytime</div>
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4 mb-5">
+
+                <div class="support-option">
+                  <div class="support-option-icon"><i class="fa-solid fa-envelope"></i></div>
+                  <div class="support-option-title">Email Support</div>
+                  <div class="support-option-desc">Send us a detailed email and we'll respond within 24 hours.</div>
+                  <button class="btn btn-outline btn-sm mt-3.5"><i class="fa-solid fa-paper-plane"></i> admin@gmail.com
+                  </button>
+                </div>
+                <div class="support-option">
+                  <div class="support-option-icon"><i class="fa-solid fa-phone"></i></div>
+                  <div class="support-option-title">Phone Support</div>
+                  <div class="support-option-desc">Call us directly. Available 9 AM – 6 PM, Sunday to Friday.</div>
+                  <div class="text-sm font-bold text-primary mt-3.5">+977-9745930951</div>
+                </div>
+                <div class="support-option">
+                  <div class="support-option-icon"><i class="fa-solid fa-book-open"></i></div>
+                  <div class="support-option-title">Help Center</div>
+                  <div class="support-option-desc">Browse FAQs, guides, and tutorials for owners.</div>
+                  <button class="btn btn-outline btn-sm mt-3.5"><i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    Visit
+                    Help Center</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div><!-- /content -->
+        </div><!-- /main -->
+      </div>
+
+      <div id="toast"></div>
+      <script src="{% static 'js/owner/owner.js' %}"></script>
+</body>
+
+</html>

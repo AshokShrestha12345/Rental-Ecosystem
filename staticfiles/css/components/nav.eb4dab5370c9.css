@@ -1,0 +1,76 @@
+/* Sidebar & Navigation Components */
+.nav-section { padding: 12px 0; }
+
+.nav-label {
+  padding: 6px 20px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,.35);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover { background: rgba(255,255,255,.08); }
+
+.nav-item.active { 
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-icon {
+  width: 18px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .7;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.nav-item.active .nav-icon,
+.nav-item:hover .nav-icon { opacity: 1; }
+
+.nav-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 700;
+}

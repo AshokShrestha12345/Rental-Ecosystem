@@ -1,0 +1,71 @@
+/* Base Styles & Variables */
+:root {
+    /* Core brand palette */
+    --color-primary: #1E3A8A;
+    --color-primary-light: #3B82F6;
+    --color-accent: #F59E0B;
+    --color-success: #10B981;
+    --color-surface: #FFFFFF;
+    --color-text-primary: #111827;
+    --color-text-secondary: #6B7280;
+
+    /* Legacy Tokens (Maintained for compatibility) */
+    --primary:        #1E3A8A;
+    --primary-light:  #3B82F6;
+    --accent:         #F59E0B;
+    --success:        #10B981;
+    --danger:         #EF4444;
+    --surface:        #FFFFFF;
+    --text-primary:   #111827;
+    --text-secondary: #6B7280;
+    --text-muted:     #9CA3AF;
+    --border:         #E5E7EB;
+    --bg:             #F3F4F8;
+
+    /* Typography */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.75rem;
+    --font-size-xxl: 2.75rem;
+
+    --transition-fast: 0.2s ease-in-out;
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--color-text-primary);
+    background-color: var(--bg);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, li {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Common active state */
+.active {
+    color: var(--color-accent);
+}
+
+/* Standardized Typography */
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }

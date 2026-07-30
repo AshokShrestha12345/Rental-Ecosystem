@@ -1,0 +1,196 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentEase — Log In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            navy: '#1E3A8A',
+                            orange: '#F59E0B',
+                            green: '#10B981',
+                            blue: '#3B82F6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/pages/login.css' %}">
+</head>
+
+<body class="flex font-sans text-gray-900" style="min-height:100vh;">
+
+    {% if error %}
+    <div id="error-toast" class="fixed top-6 right-6 z-50 max-w-sm w-full bg-white border-l-4 border-red-500 shadow-2xl rounded-r-xl p-4 transition-opacity duration-500" style="opacity: 1;">
+      <div class="flex items-start gap-3">
+        <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-gray-900">Error</h3>
+          <p class="text-sm text-gray-600 mt-1">{{ error }}</p>
+        </div>
+        <button onclick="document.getElementById('error-toast').remove()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── LEFT ── -->
+    <div class="left-panel hidden md:block">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&auto=format&fit=crop&q=80"
+            alt="Modern house" class="bg-image">
+        <div class="overlay"></div>
+
+        <div class="content">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div
+                    class="w-9 h-9 bg-brand-orange rounded-xl flex items-center justify-center text-white text-base shadow-lg">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="font-serif text-2xl font-bold text-white tracking-tight">
+                    Rent<span class="text-brand-orange">Ease</span>
+                </span>
+            </a>
+
+            <!-- Hero copy -->
+            <div class="mt-3">
+                <h1 class="font-serif text-5xl leading-[1.1] font-bold text-white mb-5">
+                    Find your home<br>without the<br><span class="text-brand-orange">broker.</span>
+                </h1>
+                <p class="text-white/70 text-sm leading-relaxed mb-5 max-w-sm">
+                    Connect directly with verified property owners across Kathmandu, Pokhara &amp; Lalitpur. No
+                    middlemen, no hidden fees.
+                </p>
+
+                <!-- Trust badges -->
+                <div class="flex flex-col gap-3">
+                    <div class="badge-card max-w-[300px] w-[280px]">
+                        <div
+                            class="w-8 h-8 rounded-full bg-blue-400/20 flex items-center justify-center text-blue-300 text-sm">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <p class="text-white text-xs font-bold">Verified Listings</p>
+                            <p class="text-white/60 text-[11px]">Every property is manually verified</p>
+                        </div>
+                    </div>
+                    <div class="badge-card max-w-[300px] w-[280px]">
+                        <div
+                            class="w-8 h-8 rounded-full bg-green-400/20 flex items-center justify-center text-green-300 text-sm">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div>
+                            <p class="text-white text-xs font-bold">No Broker Fees</p>
+                            <p class="text-white/60 text-[11px]">Direct owner contact, always free</p>
+                        </div>
+                    </div>
+                    <div class="badge-card max-w-[300px] w-[280px]">
+                        <div
+                            class="w-8 h-8 rounded-full bg-orange-400/20 flex items-center justify-center text-orange-300 text-sm">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <p class="text-white text-xs font-bold">1,200+ Properties</p>
+                            <p class="text-white/60 text-[11px]">Trusted by renters across Nepal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── RIGHT ── -->
+    <div class="right-panel">
+        <div class="form-card">
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <p class="text-brand-green text-[11px] font-bold tracking-widest uppercase mb-2">Welcome Back</p>
+                <h2 class="font-serif text-3xl font-bold text-brand-navy mb-1">
+                    Log in to <span class="text-brand-orange">RentEase</span>
+                </h2>
+                <p class="text-gray-400 text-xs">Access your listings, bookings &amp; rental dashboard.</p>
+            </div>
+
+            <!-- Social Buttons -->
+
+
+            <!-- Form -->
+            <form id="login-form" method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label for="email" class="block text-xs font-bold text-brand-navy mb-1.5">Email Address</label>
+                    <div class="relative">
+                        <i
+                            class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                        <input type="email" name="email" id="email" placeholder="you@example.com" autocomplete="email"
+                            class="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-brand-navy placeholder:text-gray-300">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-xs font-bold text-brand-navy mb-1.5">Password</label>
+                    <div class="relative">
+                        <i
+                            class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                        <input type="password" name="password" id="password" placeholder="Enter your password"
+                            autocomplete="current-password"
+                            class="w-full pl-9 pr-11 py-3 rounded-xl border border-gray-200 text-sm text-brand-navy placeholder:text-gray-300">
+                        <button type="button" id="toggleBtn" onclick="togglePassword()"
+                            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-brand-navy transition-colors">
+                            <i class="fa-solid fa-eye text-xs" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-5">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 accent-brand-navy cursor-pointer">
+                        <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">Remember
+                            me</span>
+                    </label>
+                    <a href="{% url 'forgot_password' %}"
+                        class="text-xs font-semibold text-brand-blue hover:text-brand-navy transition-colors">Forgot
+                        password?</a>
+                </div>
+
+                <button type="submit"
+                    class="form_disable w-full bg-brand-navy text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#152c6b] hover:shadow-lg hover:shadow-brand-navy/20 transition-all duration-300">
+                    Log In <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-gray-400 mt-5">
+                Don't have an account?
+                <a href="{% url 'sign' %}"
+                    class="text-brand-blue font-bold hover:text-brand-navy transition-colors ml-1">Create one free</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="{% static 'js/pages/login.js' %}">
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+/* Footer Component */
+footer {
+    background-color: #0A0F1C;
+    background-image: 
+        radial-gradient(ellipse at 10% 50%, rgba(30, 58, 138, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 90% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    color: var(--color-surface);
+    padding: 72px 70px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 70px;
+    right: 70px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), rgba(245, 158, 11, 0.3), transparent);
+}
+
+.footer-logo i {
+    font-size: 1.4rem;
+    color: #3B82F6;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    padding: 10px 12px;
+    border-radius: 10px;
+    line-height: 1;
+}
+
+.footer-logo span {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+
+.footer-button {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.footer-button button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #9CA3AF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    padding: 0;
+    font-size: 0.85rem;
+}
+
+.footer-button button:hover {
+    background: #1E3A8A;
+    border-color: #3B82F6;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+}
+
+.footer-content-links,
+.footer-content-legal,
+.footer-content-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.footer-content-links > span,
+.footer-content-legal > span,
+.footer-content-contact > span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+.footer-content-links > span::after,
+.footer-content-legal > span::after,
+.footer-content-contact > span::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 28px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #3B82F6, #F59E0B);
+}
+
+.footer-links ul,
+.footer-legal ul,
+.footer-contact ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links ul li a,
+.footer-legal ul li a {
+    color: #9CA3AF;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+    text-decoration: none;
+}
+
+.footer-links ul li a:hover,
+.footer-legal ul li a:hover {
+    color: #fff;
+    padding-left: 14px;
+}
+
+.footer-contact ul {
+    gap: 14px;
+}
+
+.footer-contact ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #9CA3AF;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.footer-contact ul li i {
+    color: #3B82F6;
+    width: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.footer-contact ul li span {
+    color: #9CA3AF;
+    transition: color 0.2s ease;
+}
+
+.footer-contact ul li:hover span {
+    color: #fff;
+}

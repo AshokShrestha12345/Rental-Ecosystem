@@ -1,0 +1,162 @@
+.hero-intro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+     background-image:
+        linear-gradient(rgba(0, 0, 0 , 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0 , 0.05) 1px, transparent 1px);
+    background-size: 40px 40px; 
+    pointer-events: none;
+}
+
+.hero-intro-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 36px 32px 32px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1E3A8A, #3B82F6);
+    border-radius: 20px 20px 0 0;
+}
+
+.hero-intro-card:nth-child(2)::before {
+    background: linear-gradient(90deg, #C2410C, #F97316);
+}
+
+.hero-intro-card:nth-child(3)::before {
+    background: linear-gradient(90deg, #0D9488, #2DD4BF);
+}
+
+.hero-intro-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(30,58,138,0.1);
+    border-color: #DBEAFE;
+}
+
+.hero-intro-card:nth-child(2):hover {
+    box-shadow: 0 20px 50px rgba(234,88,12,0.1);
+    border-color: #FED7AA;
+}
+
+.hero-intro-card:nth-child(3):hover {
+    box-shadow: 0 20px 50px rgba(20,186,185,0.1);
+    border-color: #CCFBF1;
+}
+
+.hero-intro-card i {
+    font-size: 1.5rem;
+    color: #1E3A8A;
+    background: #EFF6FF;
+    padding: 0;
+    border-radius: 12px;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.hero-intro-card:hover i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.hero-intro-card:nth-child(2) i {
+    background: #FFF7ED;
+    color: #EA580C;
+}
+
+.hero-intro-card:nth-child(3) i {
+    background: #F0FDFA;
+    color: #0D9488;
+}
+
+.hero-intro-card > span {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.renter-points {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    flex: 1;
+}
+
+.points {
+    color: #4B5563;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.4;
+    padding-left: 22px;
+    position: relative;
+}
+
+.points::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1E3A8A;
+}
+
+.hero-intro-card:nth-child(2) .points::before {
+    background: #EA580C;
+}
+
+.hero-intro-card:nth-child(3) .points::before {
+    background: #0D9488;
+}
+
+.hero-intro-card button {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+}
+
+.hero-intro-card button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.find-home-btn {
+    background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+}
+
+.list-property {
+    background: linear-gradient(135deg, #C2410C, #F97316);
+}
+
+.learn-more {
+    background: linear-gradient(135deg, #0D9488, #2DD4BF);
+}

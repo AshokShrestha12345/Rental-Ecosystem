@@ -1,0 +1,139 @@
+
+
+/* Dashed connecting line between step icons */
+.how-it-works-card-container::before {
+    content: '';
+    position: absolute;
+    top: 54px;
+    left: calc(16.67% + 27px);
+    right: calc(16.67% + 27px);
+    height: 2px;
+    background: linear-gradient(90deg, #DBEAFE 0%, #93C5FD 50%, #DBEAFE 100%);
+    z-index: 0;
+}
+
+/* ── Step card ── */
+.how-it-works-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 40px 28px 36px;
+    border-radius: 20px;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.how-it-works-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(30,58,138,0.1);
+    border-color: #DBEAFE;
+}
+
+.how-it-works-card:nth-child(2):hover {
+    box-shadow: 0 20px 50px rgba(234,88,12,0.1);
+    border-color: #FED7AA;
+}
+
+.how-it-works-card:nth-child(3):hover {
+    box-shadow: 0 20px 50px rgba(13,148,136,0.1);
+    border-color: #CCFBF1;
+}
+
+/* ── Icon circle ── */
+.how-it-work-icon {
+    position: relative;
+    width: 108px;
+    height: 108px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.how-it-work-icon i {
+    font-size: 2rem;
+    color: #1E3A8A;
+    background: #EFF6FF;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #DBEAFE;
+    transition: all 0.3s ease;
+}
+
+.how-it-works-card:hover .how-it-work-icon i {
+    transform: scale(1.08);
+    box-shadow: 0 8px 24px rgba(30,58,138,0.15);
+}
+
+/* Step number badge */
+.how-it-work-icon span {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1E3A8A;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Card 2 — orange */
+.how-it-works-card:nth-child(2) .how-it-work-icon i {
+    background: #FFF7ED;
+    color: #EA580C;
+    border-color: #FED7AA;
+}
+
+.how-it-works-card:nth-child(2) .how-it-work-icon span {
+    background: #EA580C;
+}
+
+.how-it-works-card:nth-child(2):hover .how-it-work-icon i {
+    box-shadow: 0 8px 24px rgba(234,88,12,0.18);
+}
+
+/* Card 3 — teal */
+.how-it-works-card:nth-child(3) .how-it-work-icon i {
+    background: #F0FDFA;
+    color: #0D9488;
+    border-color: #CCFBF1;
+}
+
+.how-it-works-card:nth-child(3) .how-it-work-icon span {
+    background: #0D9488;
+}
+
+.how-it-works-card:nth-child(3):hover .how-it-work-icon i {
+    box-shadow: 0 8px 24px rgba(13,148,136,0.18);
+}
+
+/* Text */
+.how-it-works-card > span {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.01em;
+}
+
+.how-it-works-card > p {
+    color: #6B7280;
+    font-size: 0.9rem;
+    text-align: center;
+    line-height: 1.65;
+    max-width: 200px;
+}

@@ -1,0 +1,816 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEase — Tenant Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E3A8A',
+            'primary-light': '#3B82F6',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            surface: '#FFFFFF',
+            'text-primary': '#111827',
+            'text-secondary': '#6B7280',
+            'text-muted': '#9CA3AF',
+            border: '#E5E7EB',
+            bg: '#F3F4F8',
+          },
+          spacing: { 'sidebar-w': '260px' },
+          fontFamily: {
+            playfair: ['"Playfair Display"', 'serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    i {
+      font-style: normal;
+    }
+  </style>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/pages/tenant.css' %}">
+</head>
+
+<body class="h-full font-sans bg-bg text-text-primary overflow-hidden">
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- ── SIDEBAR ── -->
+    <aside id="sidebar" class="flex flex-col w-sidebar-w bg-primary overflow-y-auto overflow-x-hidden relative z-10 flex-shrink-0 sidebar
+      hidden md:flex">
+
+      <a href="{% url 'home' %}"
+        class="p-[24px_20px_20px] flex items-center gap-2.5 border-b border-white/10 hover:bg-white/5 transition-all">
+        <div class="w-9 h-9 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-house text-black text-center text-sm"></i>
+        </div>
+        <span class="font-playfair text-xl font-bold text-white">Rent<span class="text-accent">Ease</span></span>
+      </a>
+
+      <div class="px-5 py-4 flex items-center gap-3 border-b border-white/10">
+        <div class="user-avatar uppercase">{{ user_info.first_name|slice:":1" }}</div>
+        <div class="user-info">
+          <p id="user_name" class="name">{{ user_info.first_name }} {{ user_info.last_name }}</p>
+          <p id="user_role" class="role">{{ user_info.role }}</p>
+        </div>
+        <div
+          class="verified-badge border border-white/10 text-green text-sm flex items-center gap-2 rounded-lg font-sm bg-green-500/20 p-2 lowercase">
+          <i class="fa-solid fa-check text-green-500"></i>
+          <span class="text-green-500 font-sm">Verified</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 py-2 w-full" id="tenant-nav">
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{% url 'home' %}" class="logout-btn flex items-center gap-2.5">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Log Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+
+      <!-- Topbar -->
+      <header class="bg-surface border-b border-border h-[90px] px-7 flex items-center justify-between flex-shrink-0">
+        <div>
+          <h2 id="topbar-title" class="font-playfair text-xl font-bold">My Dashboard</h2>
+          <p id="topbar-sub" class="text-xs text-text-muted mt-0.5">Welcome back, {{ user_info.first_name }}!</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button class="btn btn-outline btn-sm hidden md:block " data-nav="wishlist">
+            <i class="fa-solid fa-heart"></i> Saved
+          </button>
+          <button class="btn btn-primary btn-sm hidden md:block" data-nav="browse">
+            <i class="fa-solid fa-magnifying-glass"></i> Browse Homes
+          </button>
+          <button class="notif-btn" data-nav="notifications">
+            <i class="fa-solid fa-bell"></i>
+            {% if unread_count > 0 %}
+            <span class="notif-dot"></span>
+            {% endif %}
+          </button>
+
+          <button class="mobile-menu-btn md:hidden" id="mobile-menu-btn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto p-6 content ">
+
+        <!-- ── DASHBOARD ── -->
+        <section class="panel active" id="panel-dashboard">
+          <div class="grid grid-col-1 md:grid-cols-[1.5fr_1fr] gap-4 mb-5">
+
+            <article class="card">
+              <header class="card-header">
+                <span class="card-title"><i class="fa-solid fa-heart text-danger mr-1"></i> Saved Properties</span>
+                <a class="card-action" data-nav="wishlist">View All</a>
+              </header>
+              <div class="card-body" id="saved_property_card">
+                {% for room in liked_rooms %}
+                <a class="saved-mini" data-nav="property-detail" data-room-id="{{ room.id }}">
+                  <div class="saved-mini-img" style="background:linear-gradient(135deg,#dbeafe,#93c5fd)">
+                    <i class="fa-solid fa-building text-primary"></i>
+                  </div>
+                  <div class="saved-mini-info">
+                    <strong class="saved-mini-name">{{ room.room_name }}</strong>
+                    <span class="saved-mini-loc "><i class="fa-solid fa-location-dot mr-2 ml-2"></i>{{ room.city }} •
+                      {{room.beds}} Beds • {{ room.bath }} Baths</span>
+                  </div>
+                  <strong class="saved-mini-price">Rs. {{ room.price }}<span>/mo</span></strong>
+                  <button class="heart-btn" data-room-id="{{ room.id }}"><i
+                      class="fa-solid fa-heart text-danger"></i></button>
+                </a>
+                {% empty %}
+                <p class="text-center text-text-muted">No saved properties</p>
+                {% endfor %}
+              </div>
+            </article>
+
+            <div class="flex flex-col gap-4">
+              <article class="card">
+                <header class="card-header">
+                  <span class="card-title"><i class="fa-solid fa-calendar-check mr-1"></i> Booking Status</span>
+                  <a class="card-action" data-nav="my-bookings">View All</a>
+                </header>
+                <div class="card-body p-[12px_16px]">
+                  <ul class="booking-status-list">
+                    {% for booking in bookings|slice:":3" %}
+                    <li class="booking-mini">
+                      <span
+                        class="booking-mini-status {% if booking.status == 'Approved' %}approved{% elif booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}"></span>
+                      <div class="booking-mini-info">
+                        <strong class="booking-mini-name">{{ booking.room_id.room_name }}</strong>
+                        <span class="booking-mini-date">Visit: {{ booking.preferred_date }} •
+                          {{booking.status }}</span>
+                      </div>
+                      <span
+                        class="tag {% if booking.status == 'Approved' %}green{% elif booking.status == 'Rejected' %}red{% else %}gold{% endif %}">{{booking.status}}</span>
+                    </li>
+                    {% empty %}
+                    <p class="text-center text-text-muted text-xs py-2">No bookings found</p>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── BROWSE ── -->
+        <section class="panel" id="panel-browse">
+          <div class="browse-hero">
+            <h2>Find Your Perfect Home in Nepal</h2>
+            <p>1,200+ verified listings • No broker fees • Direct owner contact</p>
+            <div class="browse-search-bar">
+              <input type="text" id="browse-search-input" placeholder="Search by location, property name...">
+              <select id="browse-price-filter">
+                <option value="all">Any Price</option>
+                <option value="0-15000">Under 15K</option>
+                <option value="15000-30000">15K–30K</option>
+                <option value="30000-60000">30K–60K</option>
+                <option value="60000-999999">60K+</option>
+              </select>
+              <select id="browse-city-filter">
+                <option value="all">All Cities</option>
+                <option value="Kathmandu">Kathmandu</option>
+                <option value="Lalitpur">Lalitpur</option>
+                <option value="Bhaktapur">Bhaktapur</option>
+                <option value="Pokhara">Pokhara</option>
+              </select>
+              <button id="browse-search-btn">Search <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 gap-4" id="property-grid">
+            {% for room in rooms %}
+            {% if room.is_occupied == False %}
+            <article class="prop-card" data-room-id="{{ room.id }}">
+              <div class="prop-card-img" style="background:linear-gradient(135deg,#1E3A8A,#3B82F6)">
+                {% if room.image %}
+                <img src="{{ room.image.url }}" alt="{{ room.room_name }}" class="w-full h-full object-cover" />
+                {% else %}
+                <i class="fa-solid fa-building text-[44px] text-white/60"></i>
+                {% endif %}
+                <button class="wishlist-btn {% if room.liked %}saved{% endif %}" data-room-id="{{ room.id }}"><i
+                    class="fa-solid fa-heart"></i></button>
+                <span class="prop-card-badge verified"><i class="fa-solid fa-check"></i> Verified</span>
+              </div>
+              <div class="prop-card-body">
+                <h3 class="prop-card-title">{{ room.room_name }}</h3>
+                <p class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> {{ room.city }}, Kathmandu</p>
+                <ul class="prop-card-meta">
+                  <li class="prop-meta-item"><i class="fa-solid fa-bed"></i> {{ room.beds }} Beds</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-shower"></i> {{ room.bath }} Baths</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-ruler-combined"></i> {{ room.sqft }} sqft</li>
+                </ul>
+                <div class="prop-card-footer">
+                  <strong class="prop-price">Rs. {{ room.price }}<span>/mo</span></strong>
+                  <span class="prop-rating"><span class="star">★</span> {{ room.rating }}</span>
+                </div>
+                <div class="prop-card-actions">
+                  <button class="btn btn-outline btn-xs view-detail-btn" data-nav="property-detail"
+                    data-room-id="{{ room.id }}">
+                    <i class="fa-solid fa-eye"></i> View
+                  </button>
+                  <button class="btn btn-primary btn-xs" data-nav="booking-request" data-room-id="{{ room.id }}">
+                    <i class="fa-solid fa-calendar"></i> Book
+                  </button>
+                </div>
+              </div>
+            </article>
+            {% endif %}
+            {% empty %}
+            <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem;">No properties listed
+              yet.</p>
+            {% endfor %}
+          </div>
+        </section>
+
+        <!-- ── PROPERTY DETAIL (pre-filled with first room) ── -->
+        <section class="panel" id="panel-property-detail">
+          <a class="detail-back" data-nav="browse">
+            <i class="fa-solid fa-arrow-left"></i> Back to Browse
+          </a>
+          {% with first_room=rooms|first %}
+          <div class="detail-hero-img" id="detail-hero-img">
+            <i class="fa-solid fa-building text-[80px] text-white/40"></i>
+            <div class="detail-hero-overlay">
+              <h2 class="detail-hero-title" id="detail-title">{{ first_room.room_name|default:"Property Name" }}</h2>
+              <p class="detail-hero-loc" id="detail-location">
+                <i class="fa-solid fa-location-dot"></i> <span id="detail-city">{{ first_room.city|default:"" }}</span>
+                &nbsp;•&nbsp;
+                <i class="fa-solid fa-star text-accent"></i> <span id="detail-rating">
+                  {{first_room.rating|default:"0.0"}}</span> &nbsp;•&nbsp;
+                <i class="fa-solid fa-circle-check text-success"></i> Verified Owner
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-2.5 mb-5">
+            <div class="detail-thumb"><i class="fa-solid fa-bed"></i>
+              <span id="detail-beds"> {{ first_room.beds|default:0 }} </span>
+            </div>
+            <div class="detail-thumb"><i class="fa-solid fa-bath"></i>
+              <span id="detail-baths"> {{ first_room.bath|default:0 }} </span>
+            </div>
+            <div class="detail-thumb"><i class="fa-solid fa-ruler-combined"></i>
+              <span id="detail-sqft"> {{ first_room.sqft|default:0 }} </span> sqft
+            </div>
+            <div class="detail-thumb"><i class="fa-solid fa-tag"></i> Rs.
+              <span id="detail-price">{{first_room.price|default:0}}</span>/mo
+            </div>
+          </div>
+
+          <div class="grid grid-cols-[1fr_320px] gap-5">
+            <div class="flex flex-col gap-3.5">
+              <article class="card p-5">
+                <h3 class="detail-section-title">About This Property</h3>
+                <p class="detail-desc" id="detail-description">{{ first_room.description }}</p>
+                <p class="text-sm text-text-muted mt-2"><i class="fa-solid fa-user"></i> Owner: <span
+                    id="detail-owner">{{ first_room.owner.first_name }} {{ first_room.owner.last_name }}</span></p>
+              </article>
+              <article class="card p-5">
+                <h3 class="detail-section-title">Tenant Reviews</h3>
+                <div class="flex items-center gap-4 mb-3.5 pb-3.5 border-b border-border">
+                  <strong class="font-playfair text-5xl font-bold leading-none" id="detail-avg-rating">
+                    {{first_room.rating|default:"0.0"}}</strong>
+                  <div>
+                    <p class="text-accent text-xl" id="detail-stars-display">★★★★★</p>
+                    <p class="text-xs text-text-muted">Based on <span id="detail-review-count">0</span> reviews</p>
+                  </div>
+                </div>
+                <div id="detail-reviews-list">
+                  <!-- injected by JS -->
+                </div>
+              </article>
+            </div>
+
+            <aside>
+              <div class="booking-widget">
+                <strong class="booking-price">Rs.
+                  <span id="detail-side-price">{{ first_room.price|default:0 }}</span><span>/month</span></strong>
+                <p class="text-xs text-text-secondary mb-4">
+                  <i class="fa-solid fa-star text-accent"></i> <span
+                    id="detail-side-rating">{{first_room.rating|default:"0.0"}}</span> &nbsp;•&nbsp;
+                  <span id="detail-side-review-count">0</span> reviews &nbsp;•&nbsp;
+                  <i class="fa-solid fa-circle-check text-success"></i> Verified
+                </p>
+                <div class="flex flex-col gap-2 mb-4 text-[13px]">
+                  <div class="flex justify-between"><span class="text-text-muted">Deposit</span><strong
+                      id="detail-deposit">Rs. {{ first_room.price|default:0 |add:"0"|floatformat:0 }}</strong></div>
+                  <div class="flex justify-between"><span class="text-text-muted">Availability</span><strong
+                      class="text-success">Available Now</strong></div>
+                  <div class="flex justify-between"><span class="text-text-muted">Min. Lease</span><strong>6
+                      months</strong></div>
+                </div>
+                <button class="btn btn-primary w-full mb-2" data-nav="booking-request" id="detail-book-btn"
+                  data-room-id="{{ first_room.id }}">
+                  <i class="fa-solid fa-calendar"></i> Request Visit
+                </button>
+                <button class="btn btn-accent w-full mb-2" data-nav="booking-request"><i class="fa-solid fa-house"></i>
+                  Book Now</button>
+
+              </div>
+
+              <article class="card p-4 mb-3">
+                <div class="flex items-center gap-3 mb-3.5">
+                  <div class="owner-avatar"><i class="fa-solid fa-user"></i></div>
+                  <div>
+                    <strong class="owner-name" id="detail-owner-name">{{ first_room.owner.first_name }}
+                      {{first_room.owner.last_name }}</strong>
+                    <p class="owner-meta">Member since {{first_room.owner.created_at|date:"F Y"}} • <i
+                        class="fa-solid fa-circle-check text-success"></i>
+                      Verified</p>
+                  </div>
+                </div>
+                <div class="flex justify-around py-3 border-y border-border mb-3">
+                  <div class="text-center"><strong class="text-base text-primary block"
+                      id="detail-owner-props">{{first_room.owner.room_set.count}}</strong><span
+                      class="text-[11px] text-text-muted">Properties</span>
+                  </div>
+                  <div class="text-center"><strong class="text-base text-primary block"
+                      id="detail-owner-rating">{{first_room.owner.rating}}★</strong><span
+                      class="text-[11px] text-text-muted">Rating</span></div>
+                  <div class="text-center"><strong class="text-base text-primary block">98%</strong><span
+                      class="text-[11px] text-text-muted">Response</span></div>
+                </div>
+
+
+              </article>
+              <button class="btn btn-danger btn-sm w-full" data-nav="report"><i class="fa-solid fa-flag"></i> Report
+                this listing</button>
+            </aside>
+          </div>
+          {% endwith %}
+        </section>
+
+        <!-- ── WISHLIST ── -->
+        <section class="panel" id="panel-wishlist">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">Saved Properties</h2>
+              <p class="section-subtitle">Properties in your wishlist</p>
+            </div>
+          </header>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 gap-4">
+            {% for room in liked_rooms %}
+            <article class="prop-card" data-room-id="{{ room.id }}">
+              <div class="prop-card-img" style="background:linear-gradient(135deg,#1E3A8A,#3B82F6)">
+                {% if room.image %}
+                <img src="{{ room.image.url }}" alt="{{ room.room_name }}" class="w-full h-full object-cover" />
+                {% else %}
+                <i class="fa-solid fa-building text-[44px] text-white/60"></i>
+                {% endif %}
+                <button class="wishlist-btn {% if room.liked %}saved{% endif %}" data-room-id="{{ room.id }}"><i
+                    class="fa-solid fa-heart"></i></button>
+                <span class="prop-card-badge verified"><i class="fa-solid fa-check"></i> Verified</span>
+              </div>
+              <div class="prop-card-body">
+                <h3 class="prop-card-title">{{ room.room_name }}</h3>
+                <p class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> {{ room.city }}, Kathmandu</p>
+                <ul class="prop-card-meta">
+                  <li class="prop-meta-item"><i class="fa-solid fa-bed"></i> {{ room.beds }} Beds</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-shower"></i> {{ room.bath }} Baths</li>
+                  <li class="prop-meta-item"><i class="fa-solid fa-ruler-combined"></i> {{ room.sqft }} sqft</li>
+                </ul>
+                <div class="prop-card-footer">
+                  <strong class="prop-price">Rs. {{ room.price }}<span>/mo</span></strong>
+                  <span class="prop-rating"><span class="star">★</span> {{ room.rating }}</span>
+                </div>
+                <div class="prop-card-actions">
+                  <button class="btn btn-outline btn-xs view-detail-btn" data-nav="property-detail"
+                    data-room-id="{{ room.id }}">
+                    <i class="fa-solid fa-eye"></i> View
+                  </button>
+                  <button class="btn btn-primary btn-xs" data-nav="booking-request" data-room-id="{{ room.id }}">
+                    <i class="fa-solid fa-calendar"></i> Book
+                  </button>
+                </div>
+              </div>
+            </article>
+            {% empty %}
+            <p class="text-center text-text-muted italic w-full col-span-full">No liked rooms yet.</p>
+            {% endfor %}
+          </div>
+        </section>
+
+        <!-- ── BOOKING REQUEST ── -->
+        <section class="panel" id="panel-booking-request">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">Book / Visit Request</h2>
+              <p class="section-subtitle">Request a visit or confirm a booking</p>
+            </div>
+          </header>
+          <div class="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-5">
+            <form action="{% url 'book_property' %}" method="POST" class="flex flex-col gap-4" id="booking-form">
+              {% csrf_token %}
+              <div class="booking-form-card">
+                <h3 class="booking-form-title"><i class="fa-solid fa-house"></i> Select Property</h3>
+                <p class="booking-form-sub">Which property would you like to book?</p>
+                <select class="form-select" name="room_id" required id="booking-room-select">
+                  <option value="">Select a Property</option>
+                  {% for room in rooms %}
+                  {% if not room.is_occupied %}
+                  <option value="{{ room.id }}">{{ room.room_name }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="booking-form-card">
+                <h3 class="booking-form-title"><i class="fa-solid fa-calendar-days"></i> Preferred Date & Time</h3>
+                <div class="grid grid-cols-2 gap-3.5">
+                  <div class="form-group">
+                    <label class="form-label">Preferred Date</label>
+                    <input type="date" name="preferred_date" class="form-input" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Move-in Date</label>
+                    <input type="date" name="move_in_date" class="form-input" required>
+                  </div>
+                </div>
+                <label class="form-label mt-3">Preferred Time</label>
+                <select class="form-select" name="preferred_time">
+                  <option value="09:00 AM">9:00 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>
+                  <option value="01:00 PM">1:00 PM</option>
+                  <option value="03:00 PM">3:00 PM</option>
+                  <option value="05:00 PM">5:00 PM</option>
+                  <option value="06:30 PM">6:30 PM</option>
+                </select>
+              </div>
+              <div class="booking-form-card">
+                <h3 class="booking-form-title"><i class="fa-solid fa-pen-to-square"></i> Additional Information</h3>
+                <div class="grid grid-cols-2 gap-3.5">
+                  <div class="form-group">
+                    <label class="form-label">Occupants</label>
+                    <select class="form-select" name="occupants">
+                      <option>Just me</option>
+                      <option>2 people</option>
+                      <option>Family (3-4)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Lease Duration</label>
+                    <input type="number" name="lease_duration" class="form-input" min="1" max="12" placeholder="Months"
+                      required>
+                  </div>
+                  <div class="form-group col-span-2">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-textarea" name="message"
+                      placeholder="Hi, I'm interested in your property..."></textarea>
+                  </div>
+                </div>
+                <div class="submit-bar">
+                  <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Send
+                    Request</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ── MY BOOKINGS ── -->
+        <section class="panel" id="panel-my-bookings">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">My Bookings</h2>
+              <p class="section-subtitle">Track all your rental requests and bookings</p>
+            </div>
+          </header>
+          <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="approved">Approved</button>
+            <button class="filter-btn" data-filter="rejected">Rejected</button>
+          </div>
+          <ul class="bookings-list">
+            {% for booking in bookings %}
+            {% if booking.is_verified_by_admin and booking.is_verified_by_owner and booking.status == "Approved"%} <li
+              class="booking-card grid grid-col-1" data-status="{{ booking.status|lower }}">
+              <div class="booking-img" style="background:linear-gradient(135deg,#dbeafe,#93c5fd)">
+                <i class="fa-solid fa-building text-[28px] text-primary-light"></i>
+              </div>
+              <div class="booking-info">
+                <strong class="booking-name">{{ booking.room_id.room_name }}</strong>
+                <p class="booking-loc"><i class="fa-solid fa-location-dot"></i>
+                  {{ booking.room_id.city }} • Owner: {{ booking.room_id.owner.first_name }}
+                  {{ booking.room_id.owner.last_name }}</p>
+                <div class="booking-meta">
+                  <span class="booking-meta-item"><i class="fa-solid fa-calendar"></i> Visit: {{booking.preferred_date}}
+                  </span>
+                  <span class="booking-meta-item"><i class="fa-solid fa-money-bill"></i> Rs.
+                    {{booking.room_id.price}}/mo </span>
+                  <span class="booking-meta-item"><i class="fa-solid fa-clock"></i> Requested {{booking.created_at }}
+                    ago </span>
+                </div>
+              </div>
+              <span
+                class="status-badge text-center {% if booking.status == 'Approved' %}approved{% elif booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+                <i
+                  class="fa-solid  {% if booking.status == 'Approved' %}fa-circle-check{% elif booking.status == 'Rejected' %}fa-circle-xmark{% else %}fa-hourglass-half{% endif %}"></i>
+                {{ booking.status }}
+              </span>
+              <div class="flex flex-col gap-1.5 ml-2">
+                <button class="btn btn-danger btn-xs"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            </li>
+            {% endif %}
+            {% empty %}
+            <p class="text-center text-text-muted italic py-4">No bookings found.</p>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <!-- ── REVIEWS ── -->
+        <section class="panel" id="panel-reviews">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">My Reviews</h2>
+              <p class="section-subtitle">Rate properties you've stayed at</p>
+            </div>
+          </header>
+          <div class="review-form-card">
+            <h3 class="text-[15px] font-bold mb-1"><i class="fa-solid fa-star text-accent"></i> Write a Review</h3>
+            <p class="text-[13px] text-text-muted mb-3.5">Share your experience to help other renters</p>
+            <form action="{% url 'review' %}" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label class="form-label">Select Property</label>
+                <select class="form-select" name="property_id" required>
+                  <option disabled selected value="">Select a Property</option>
+                  {% for room in rooms %}
+                  <option value="{{ room.id }}">{{ room.room_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Your Rating</label>
+                <div class="star-rating-input">
+                  <select name="rating" hidden>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5" selected>5</option>
+                  </select>
+                  <button type="button" class="star-btn active">★</button>
+                  <button type="button" class="star-btn active">★</button>
+                  <button type="button" class="star-btn active">★</button>
+                  <button type="button" class="star-btn active">★</button>
+                  <button type="button" class="star-btn active">★</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Review Title</label>
+                <input class="form-input" name="title" placeholder="e.g. Great location, responsive owner">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Your Experience</label>
+                <textarea class="form-textarea" name="review"
+                  placeholder="Tell others about the property, owner, neighbourhood..."></textarea>
+              </div>
+              <div class="flex gap-2.5 mt-1">
+                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Submit
+                  Review</button>
+              </div>
+            </form>
+          </div>
+
+          <h3 class="text-[15px] font-bold mb-3.5">My Past Reviews</h3>
+          <ul class="my-reviews-list">
+            {% for review in reviews %}
+            <li class="my-review-card">
+              <div class="my-review-header">
+                <div class="my-review-prop-img"><i class="fa-solid fa-house text-xl text-primary-light"></i></div>
+                <div class="my-review-info">
+                  <strong class="my-review-title">{{ review.property_id.room_name }}</strong>
+                  <span class="my-review-date">{{ review.created_at|date:"F Y" }}</span>
+                </div>
+                <span class="my-review-stars">{{ review.rating }}</span>
+              </div>
+              <p class="my-review-title">{{ review.title }}</p>
+              <p class="my-review-text">{{ review.review }}</p>
+              <div class="flex gap-2 mt-2.5">
+                <form action="{% url 'delete_review' review.id %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-danger btn-xs"><i class="fa-solid fa-trash"></i> Delete</button>
+                </form>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <!-- ── PROFILE ── -->
+        <section class="panel" id="panel-profile">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">My Profile</h2>
+              <p class="section-subtitle">Manage your personal information</p>
+            </div>
+          </header>
+          <div class="grid md:grid-cols-[240px_1fr] gap-5">
+            <aside class="bg-surface rounded-[14px] border border-border p-6 text-center h-fit">
+              <div
+                class="w-20 h-20 rounded-full bg-gradient-to-br from-success to-[#059669] flex items-center justify-center text-white text-3xl mx-auto mb-3 relative">
+                <i class="fa-solid fa-user"></i>
+                <button
+                  class="absolute bottom-0 right-0 w-6 h-6 bg-accent rounded-full flex items-center justify-center border-2 border-white">
+                  <i class="fa-solid fa-camera text-[10px] text-black"></i>
+                </button>
+              </div>
+              <h3 class="font-playfair text-lg font-bold mb-0.5">{{ user_info.first_name }} {{ user_info.last_name }}
+              </h3>
+              <p class="text-xs text-text-muted mb-3">{{ user_info.email }}</p>
+              <div class="flex justify-around py-3 border-y border-border mb-3">
+                <div><strong class="text-lg text-primary block">{{ liked_rooms|length }}</strong><span
+                    class="text-[11px] text-text-muted">Saved</span></div>
+                <div><strong class="text-lg text-primary block">{{ bookings|length }}</strong><span
+                    class="text-[11px] text-text-muted">Bookings</span></div>
+                <div><strong class="text-lg text-primary block">{{ reviews|length }}</strong><span
+                    class="text-[11px] text-text-muted">Reviews</span></div>
+              </div>
+              <div class="flex flex-wrap gap-1.5 justify-center">
+                <span class="profile-tag"><i class="fa-solid fa-magnifying-glass"></i> Searching</span>
+                <span class="profile-tag"><i class="fa-solid fa-location-dot"></i> {{ user_info.city }}</span>
+                <span class="profile-tag"><i class="fa-solid fa-circle-check"></i> Verified</span>
+              </div>
+            </aside>
+            <div class="flex flex-col gap-4">
+              <form method="POST" action="/profile/">
+                {% csrf_token %}
+                {% if messages %}
+                <div class="messages mb-4">
+                  {% for message in messages %}
+                  <div
+                    class="p-3 rounded mb-2 {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="profile-section">
+                  <h3 class="profile-section-header"><i class="fa-solid fa-user"></i> Personal Information</h3>
+                  <div class="profile-section-body">
+                    <div class="grid grid-cols-2 gap-3.5">
+                      <div class="form-group"><label class="form-label">First Name</label><input class="form-input"
+                          name="first_name" placeholder="{{ user_info.first_name }}"></div>
+                      <div class="form-group"><label class="form-label">Last Name</label><input class="form-input"
+                          name="last_name" placeholder="{{ user_info.last_name }}"></div>
+                      <div class="form-group"><label class="form-label">Email</label><input class="form-input"
+                          name="email" type="email" placeholder="{{ user_info.email }}"></div>
+                      <div class="form-group"><label class="form-label">Phone</label><input class="form-input"
+                          name="phone" placeholder="{{ user_info.phone }}"></div>
+                      <div class="form-group"><label class="form-label">City</label><input class="form-input"
+                          name="city" placeholder="{{ user_info.city }}"></div>
+                      <div class="form-group"><label class="form-label">Role</label><span
+                          class="form-input uppercase font-bold">{{ user_info.role }}</span></div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save
+                      Changes</button>
+                  </div>
+                </div>
+                <div class="profile-section">
+                  <h3 class="profile-section-header"><i class="fa-solid fa-lock"></i> Change Password</h3>
+                  <div class="profile-section-body">
+                    <div class="grid grid-cols-2 gap-3.5">
+                      <div class="form-group"><label class="form-label">New Password</label><input class="form-input"
+                          name="password" type="password" placeholder="Min 8 characters"></div>
+                      <div class="form-group"><label class="form-label">Confirm Password</label><input
+                          class="form-input" name="confirm_password" type="password" placeholder="Min 8 characters">
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm mt-3"><i class="fa-solid fa-lock"></i> Update
+                      Password</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── NOTIFICATIONS ── -->
+        <section class="panel" id="panel-notifications">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">Notifications</h2>
+              <p class="section-subtitle">{{ unread_count }} unread notifications</p>
+            </div>
+            <button class="btn btn-outline btn-sm" id="mark-all-read-btn"><i class="fa-solid fa-check-double"></i> Mark
+              all read</button>
+          </header>
+          <div class="bg-surface rounded-[14px] border border-border overflow-hidden">
+            <ul class="notif-list">
+              {% for notification in notifications %}
+              <li class="notif-item {% if not notification.is_read %}unread{% endif %}">
+                <div class="notif-icon-wrap booking"><i class="fa-solid fa-bell"></i></div>
+                <div class="notif-content">
+                  <strong class="notif-title">
+                    From: {{ notification.from_user.first_name }} {{ notification.from_user.last_name }}
+                  </strong>
+                  <p class="notif-desc">{{ notification.message }}</p>
+                  <span class="notif-time">{{ notification.created_at|timesince }} ago</span>
+                </div>
+                {% if not notification.is_read %}
+                <span class="notif-dot-badge"></span>
+                {% endif %}
+              </li>
+              {% empty %}
+              <li class="p-4 text-center text-text-muted italic">No notifications found.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
+
+        <!-- ── REPORT LISTING ── -->
+        <section class="panel" id="panel-report">
+          <header class="section-header">
+            <div>
+              <h2 class="section-title">Report a Listing</h2>
+              <p class="section-subtitle">Help us keep RentEase safe and honest</p>
+            </div>
+          </header>
+          <div class="report-info-card">
+            <i class="fa-solid fa-triangle-exclamation text-danger text-[22px]"></i>
+            <div>
+              <strong class="text-[13px] text-red-800">Important Notice</strong>
+              <p class="text-xs text-red-700 mt-0.5 leading-relaxed">Reports are taken seriously. Our team reviews every
+                report within 24 hours.</p>
+            </div>
+          </div>
+          <form action="{% url 'report' %}" method="POST" id="reportForm">
+            {% csrf_token %}
+            <div class="report-prop-select">
+              <h3 class="report-prop-header"><i class="fa-solid fa-house"></i> Which property are you reporting?</h3>
+              <ul class="report-prop-list">
+                {% for room in rooms %}
+                <li class="report-prop-option">
+                  <input type="radio" name="room_id" value="{{ room.id }}" class="hidden" style="display:none;" />
+                  <div class="prop-thumb"><i class="fa-solid fa-building text-[18px] text-primary-light"></i></div>
+                  <div class="report-prop-option-info">
+                    <strong class="report-prop-option-name">{{ room.room_name }}</strong>
+                    <p class="report-prop-option-loc"><i class="fa-solid fa-location-dot"></i> {{ room.city }} • Owner:
+                      {{ room.owner.first_name }} {{ room.owner.last_name }}</p>
+                  </div>
+                  <i class="fa-solid fa-circle-dot"></i>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div class="bg-surface rounded-[14px] border border-border p-6">
+              <h3 class="text-[15px] font-bold mb-3.5"><i class="fa-solid fa-flag text-danger"></i> Report Category</h3>
+              <select class="report-category-grid" name="report_category" required>
+                <option value="">Select Category</option>
+                <option value="fake-scam">Fake / Scam</option>
+                <option value="misleading-photos">Misleading Photos</option>
+                <option value="wrong-price">Wrong Price</option>
+                <option value="harassment">Harassment</option>
+                <option value="already-rented">Already Rented</option>
+                <option value="other-issue">Other Issue</option>
+              </select>
+              <div class="form-group">
+                <label class="form-label">Describe the Issue <span class="req">*</span></label>
+                <textarea class="form-textarea" name="report_details" required
+                  placeholder="Please provide specific details..."></textarea>
+              </div>
+              <div class="submit-bar">
+                <button type="submit" class="btn btn-danger-solid"><i class="fa-solid fa-flag"></i> Submit
+                  Report</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+      </div><!-- /content -->
+    </main>
+  </div>
+
+
+  <div id="toast"></div>
+  <script src="{% static 'js/tenant/tenant.js' %}"></script>
+</body>
+
+</html>

@@ -1,0 +1,337 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentEase - Find Your Home in Nepal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1E3A8A",
+                        accent: "#F59E0B",
+                        secondary: "#e1e1e1ff",
+                        "hover-primary": "#3B82F6",
+                        "surface-primary": "rgba(255, 255, 255, 0.85)",
+                        "surface-secondary": "rgba(255, 255, 255, 0.08)",
+                        "border-primary": "rgba(255, 255, 255, 0.1)",
+                        "border-secondary": "rgba(255, 255, 255, 0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/pages/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="flex flex-col ">
+
+    <!-- ── HERO ── -->
+    <div class="hero-background relative w-full min-h-screen overflow-hidden">
+
+        <header id="site-header" class="relative z-10 h-20 px-[30px] flex justify-between items-center gap-4
+                border-b border-border-primary transition-all duration-300">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-2.5">
+                <i class="fa fa-home text-[1.4rem]
+                        bg-accent text-white border border-[rgba(59,130,246,0.3)]
+                        w-[42px] h-[42px] rounded-[10px] flex items-center justify-center"></i>
+                <span class="font-serif text-2xl font-bold text-white tracking-tight">
+                    Rent<span class="text-accent">Ease</span>
+                </span>
+            </div>
+
+            <!-- Nav -->
+            <div class="header-nav">
+
+                <nav class="flex flex-row">
+                    <ul class="flex flex-row items-center gap-2 hidden md:flex" id="nav-link">
+
+                    </ul>
+                    <div class="flex items-center gap-2 ml-2">
+                        <a href="{% url 'login' %}" class="px-5 py-2 rounded-lg border border-[rgba(255,255,255,0.3)]
+                                        bg-transparent text-white text-sm font-medium
+                                        hover:bg-surface-secondary transition-all duration-200">
+                            Login
+                        </a>
+                        <a href="{% url 'sign' %}" class="px-5 py-2 rounded-lg bg-accent text-black text-sm font-semibold
+                                        hover:scale-105 hover:bg-yellow-400 transition-all duration-200">
+                            Register
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="relative z-[1] h-[calc(100vh-80px)] px-[70px] flex flex-col justify-center overflow-hidden
+            bg-[#151F47]">
+                <div class="absolute right-[100px] h-full bottom-0 object-cover w-[800px]
+                flex items-center justify-center
+                hidden md:flex ">
+                    <video src="{% static 'video/family.mp4' %}" autoplay loop playsinline muted></video>
+                </div>
+
+                <div class="flex flex-col text-start gap-6 max-w-[600px] z-10">
+
+                    <h1
+                        class="text-[clamp(2rem,5vw,3.2rem)] font-extrabold text-white text-start leading-tight tracking-tight">
+                        Stop paying brokers.
+                        <span class="text-start text-accent block">Find direct owners.</span>
+                    </h1>
+
+                    <p class="max-w-[480px] text-start text-white/75 text-base leading-relaxed">
+                        No brokerage fees. Verified listings in Kathmandu, Pokhara & Lalitpur.
+                        Connect directly with property owners.
+                    </p>
+                </div>
+                <div class="flex gap-8 mt-12">
+                    <div><span class="text-2xl font-bold text-white">1,200+</span>
+                        <p class="text-white/60 text-sm">Verified Listings</p>
+                    </div>
+                    <div><span class="text-2xl font-bold text-white">RS 0</span>
+                        <p class="text-white/60 text-sm">Broker Fees</p>
+                    </div>
+                    <div><span class="text-2xl font-bold text-white">98%</span>
+                        <p class="text-white/60 text-sm">Happy Tenants</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ── WHY CHOOSE US ── -->
+    <section class="px-[70px] py-20 bg-white relative overflow-hidden hero-intro ">
+        <div class="mb-3 relative z-10">
+            <h2 class="text-4xl font-bold leading-tight">Why Choose Us</h2>
+            <p class="text-base text-gray-500 leading-relaxed">A complete rental ecosystem for tenants, owners, and
+                landlords in Nepal.</p>
+        </div>
+        <div
+            class="hero-intro-card-container pt-11 grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 gap-7 relative z-10">
+
+            <div class="hero-intro-card">
+                <i class="fa fa-user"></i>
+                <span>For renters</span>
+                <div class="renter-points">
+                    <span class="points">Explore & book rooms</span>
+                    <span class="points">Easy search & secure booking</span>
+                    <span class="points">Verified listings and support</span>
+                    <span class="points">Transparent ratings</span>
+                </div>
+                <a href="{% url 'sign' %}" class="find-home-btn inline-block  text-center rounded-md p-2">Find a Home</a>
+            </div>
+
+            <div class="hero-intro-card">
+                <i class="fa fa-building"></i>
+                <span>For owners</span>
+                <div class="renter-points">
+                    <span class="points">List properties</span>
+                    <span class="points">Manage rentals & earn income</span>
+                    <span class="points">Transparent payment tracking</span>
+                    <span class="points">Market analytics</span>
+                </div>
+                <a href="{% url 'sign' %}" class="list-property inline-block text-center rounded-md p-2">List Your Property</a>
+            </div>
+
+            <div class="hero-intro-card">
+                <i class="fa fa-shield"></i>
+                <span>Trusted & Verified</span>
+                <div class="renter-points">
+                    <span class="points">Verified listings and support</span>
+                    <span class="points">Admin approval system</span>
+                    <span class="points">Report system enabled</span>
+                    <span class="points">Safe & reliable</span>
+                </div>
+                <a href="{% url 'sign' %}" class="learn-more inline-block text-center rounded-md p-2">Admin Panel</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FEATURED PROPERTIES ── -->
+    <section class="px-[70px] py-20 bg-white relative overflow-hidden 
+    after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-[90%] 
+    after:h-[1px] after:bg-black/20" id="property">
+        <div class="mb-3">
+            <h2 class="text-4xl font-bold leading-tight">Featured Properties</h2>
+            <p class="text-base text-gray-500 leading-relaxed">Handpicked and verified listings across Kathmandu,
+                Pokhara & Lalitpur.</p>
+        </div>
+        <div id="featured-card-container" class="pt-10 grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 gap-7">
+            <!-- featured cards loaded by JS -->
+        </div>
+    </section>
+
+    <!-- ── HOW IT WORKS ── -->
+    <section class="px-[70px] py-20 bg-white relative overflow-hidden" id="working">
+        <div class="mb-3">
+            <h2 class="text-4xl font-bold leading-tight">How It Works</h2>
+            <p class="text-base text-gray-500 leading-relaxed">A step-by-step guide to finding your next rental.</p>
+        </div>
+        <div
+            class="how-it-works-card-container grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 gap-7 mt-12 relative">
+
+            <div class="how-it-works-card">
+                <div class="how-it-work-icon one">
+                    <i class="fa fa-search"></i>
+                    <span>1</span>
+                </div>
+                <span>Search & Discover</span>
+                <p>Find your ideal rental easily.</p>
+            </div>
+
+            <div class="how-it-works-card">
+                <div class="how-it-work-icon two">
+                    <i class="fa fa-calendar"></i>
+                    <span>2</span>
+                </div>
+                <span>Book & Reserve</span>
+                <p>Send requests and schedule visits online.</p>
+            </div>
+
+            <div class="how-it-works-card">
+                <div class="how-it-work-icon three">
+                    <i class="fa fa-key"></i>
+                    <span>3</span>
+                </div>
+                <span>Move In & Enjoy</span>
+                <p>Simple & hassle-free moving.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FIND HOME CTA ── -->
+    <section class="relative w-full min-h-[400px]  md:h-[600px] bg-transparent overflow-hidden group" id="about">
+        <!-- Video Background -->
+        <video id="promoVideo" src="{% static 'video/promo.mp4' %}"
+            class="absolute top-0 left-0 w-full h-full object-cover" autoplay muted loop playsinline
+            poster="{% static 'images/person.png' %}">
+        </video>
+        <div class="absolute bg-white w-20 h-10 top-0 left-0 z-100"></div>
+
+        <!-- Lighter Overlay (only bottom portion for CTAs) -->
+        <div
+            class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-5">
+        </div>
+
+        <!-- Volume Button - Top Right (won't interfere with video content) -->
+        <button id="volumeBtn"
+            class="absolute top-6 right-6 z-20 bg-white/90 hover:bg-white text-[#182C64] w-10 h-10 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center font-bold">
+            🔇
+        </button>
+
+        <!-- Content - ONLY at Bottom (below video text) -->
+        <div class="relative z-10 flex flex-col items-center justify-end h-full text-center text-white px-4 pb-16">
+            <!-- Minimal, Clean CTAs -->
+            <div class="flex flex-col hidden md:flex-row gap-4">
+                <a href="{% url 'tenant' %}"
+                    class="bg-yellow-500 hover:bg-yellow-400 text-[#182C64] px-8 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl">
+                    Browse Properties
+                </a>
+                <a href="{% url 'owner' %}"
+                    class="bg-white hover:bg-gray-100 text-[#182C64] px-8 py-3 rounded-lg font-semibold transition-all shadow-lg">
+                    List Your Property
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <!-- ── REVIEWS ── -->
+    <section class="px-[70px] py-20 bg-white relative overflow-hidden review">
+        <div class="mb-12">
+            <h2 class="text-4xl font-bold leading-tight">What our users say</h2>
+            <p class="text-base text-gray-500 leading-relaxed">Trusted by thousands of renters and landlords across
+                Nepal</p>
+        </div>
+        <div class="flex items-center gap-6 relative review-card-container md:flex-row flex-col ">
+            <!-- review cards loaded by JS -->
+        </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <!-- FIX: removed conflicting Tailwind classes — footer.css owns background/padding -->
+    <footer>
+        <div class="grid grid-col-1 md:grid-cols-4 gap-7 pb-11">
+
+            <div class="flex flex-col gap-5">
+                <div class="flex items-center gap-2 footer-logo">
+                    <i class="fa fa-building"></i>
+                    <span>RentEase Nepal</span>
+                </div>
+                <p class="text-secondary text-base leading-relaxed max-w-[280px] text-left">
+                    Nepal's trusted platform for verified rental properties. No brokers. Direct owners. Safe & secure.
+                </p>
+                <div class="footer-button">
+                    <button><i class="fa-brands fa-facebook w-10  text-white"></i></button>
+                    <button><i class="fa-brands fa-instagram w-10  text-white"></i></button>
+                    <button><i class="fa-brands fa-twitter w-10  text-white"></i></button>
+
+                    <button><i class="fa-solid fa-envelope w-10  text-white"></i></button>
+                </div>
+            </div>
+
+            <div class="footer-content-links">
+                <span>Quick Links</span>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'tenant' %}">Tenant Page</a></li>
+                        <li><a href="{% url 'owner' %}">Owner Page</a></li>
+                        <li><a href="{% url 'admin_panel' %}">Admin Panel</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-content-legal">
+                <span>Legal</span>
+                <div class="footer-legal">
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="footer-content-contact">
+                <span>Contact Us</span>
+                <div class="footer-contact">
+                    <ul>
+                        <li><i class="fa fa-location-dot"></i><span>Kathmandu, Nepal</span></li>
+                        <li><i class="fa fa-phone"></i><span>974532...</span></li>
+                        <li><i class="fa fa-envelope"></i><span>rentease.nepal@gmail.com</span></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="py-5 border-t border-[rgba(255,255,255,0.08)] flex items-center justify-center">
+            <p class="text-secondary text-base leading-relaxed">
+                Copyright &copy; 2026 RentEase Nepal. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+<script>
+  window.APP_URLS = {
+    login: "{% url 'login' %}"
+  };
+</script>
+
+    <script type="module" src="{% static 'js/pages/home.js' %}"></script>
+</body>
+
+</html>

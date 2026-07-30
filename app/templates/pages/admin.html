@@ -1,0 +1,586 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEase — Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1E3A8A',
+            blue: '#3B82F6',
+            accent: '#F59E0B',
+            green: '#10B981',
+            danger: '#EF4444',
+            purple: '#8B5CF6',
+            sidebar: '#0D1117',
+            surface: '#FFFFFF',
+            bg: '#F1F3F8',
+            border: '#E5E7EB',
+            'text-primary': '#111827',
+            'text-secondary': '#6B7280',
+            'text-muted': '#9CA3AF',
+          },
+          spacing: { 'sidebar-w': '250px' },
+          fontFamily: {
+            playfair: ['"Playfair Display"', 'serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    i {
+      font-style: normal;
+    }
+  </style>
+  <link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">
+</head>
+
+<body class="h-full font-sans bg-bg text-text-primary overflow-hidden">
+
+  {% if messages %}
+  <div class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg text-sm font-medium shadow-lg
+      {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar"
+      class="flex flex-col w-sidebar-w bg-green md:bg-sidebar flex-shrink-0 overflow-y-auto overflow-x-hidden relative z-50 sidebar hidden md:flex"
+      style="background-color: black !important;">
+      <a href="{% url 'home' %}"
+        class="p-[22px_18px_18px] flex items-center gap-2.5 border-b border-white/[.07] hover:bg-white/[.03] transition-all">
+        <div class="w-[34px] h-[34px] bg-accent rounded-[9px] flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-house text-black text-sm"></i>
+        </div>
+        <div class="font-playfair text-[19px] font-bold text-white">Rent<span class="text-accent">Ease</span></div>
+        <div class="admin-tag ml-auto">Admin</div>
+      </a>
+
+      <div class="px-[18px] py-3.5 flex items-center gap-2.5 border-b border-white/[.07]">
+        <div class="admin-avatar">{{ admin_user.first_name|first|upper }}</div>
+        <div class="admin-info">
+          <div class="name">{{ admin_user.first_name }} {{ admin_user.last_name }}</div>
+          <div class="role">{{ admin_user.email }}</div>
+        </div>
+      </div>
+
+      <div id="side-nav-bar" class="flex flex-col flex-1 w-full"></div>
+
+      <div class="mt-auto px-[18px] py-3.5 border-t border-white/[.07]">
+        <a href="{% url 'home' %}" class="logout-row mt-2 block hover:text-white transition-all">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Sign Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 flex flex-col overflow-y-auto min-w-0">
+
+      <div class="bg-surface border-b border-border h-14 px-6 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div>
+            <h2 id="topbar-title" class="font-playfair text-lg font-bold">Dashboard</h2>
+            <p id="topbar-sub" class="text-[11px] text-text-muted mt-0.5">RentEase — Admin Overview</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-outline btn-sm" data-nav="reports">
+            <i class="fa-solid fa-flag"></i> Reports ({{ report_count }})
+          </button>
+          <button class="btn btn-primary btn-sm hidden md:block" data-nav="notifications">
+            <i class="fa-solid fa-bullhorn"></i> Send Alert
+          </button>
+
+          <button class="mobile-menu-btn md:hidden " id="mobile-menu-btn">
+            <i class="fa-solid fa-bars font-md "></i>
+          </button>
+
+        </div>
+      </div>
+
+      <div class="flex-1 p-5 content">
+
+        <!-- DASHBOARD -->
+        <div class="panel active" id="panel-dashboard">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+            <div class="stat-card">
+              <div class="corner bg-blue"></div>
+              <div class="stat-icon bg-[rgba(59,130,246,.1)] text-blue"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-val">{{ total_users }}</div>
+              <div class="stat-lbl">Total Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="corner bg-green"></div>
+              <div class="stat-icon bg-[rgba(16,185,129,.1)] text-green"><i class="fa-solid fa-building"></i></div>
+              <div class="stat-val">{{ total_properties }}</div>
+              <div class="stat-lbl">Properties</div>
+            </div>
+            <div class="stat-card">
+              <div class="corner bg-accent"></div>
+              <div class="stat-icon bg-[rgba(245,158,11,.1)] text-accent"><i class="fa-solid fa-calendar-check"></i>
+              </div>
+              <div class="stat-val">{{ active_bookings }}</div>
+              <div class="stat-lbl">Active Bookings</div>
+            </div>
+            <div class="stat-card">
+              <div class="corner bg-danger"></div>
+              <div class="stat-icon bg-[rgba(239,68,68,.1)] text-danger"><i class="fa-solid fa-flag"></i></div>
+              <div class="stat-val">{{ report_count }}</div>
+              <div class="stat-lbl">Open Reports</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div class="card">
+              <div class="card-hdr">
+                <span class="card-title"><i class="fa-solid fa-bolt mr-1"></i> Pending Actions</span>
+              </div>
+              <div class="card-body">
+                <div class="urgent-list">
+                  <div class="urgent-item red" data-nav="properties">
+                    <div class="urgent-icon"><i class="fa-solid fa-house"></i></div>
+                    <div class="urgent-info">
+                      <div class="urgent-title">{{ pending_rooms }} Properties Awaiting Verification</div>
+                    </div>
+                    {% if pending_rooms %}<span class="tag red">Pending</span>{% endif %}
+                  </div>
+                  <div class="urgent-item red" data-nav="bookings">
+                    <div class="urgent-icon"><i class="fa-solid fa-calendar"></i></div>
+                    <div class="urgent-info">
+                      <div class="urgent-title">{{ pending_bookings }} Pending Booking Requests</div>
+                    </div>
+                    {% if pending_bookings %}<span class="tag gold">Review</span>{% endif %}
+                  </div>
+                  <div class="urgent-item gold" data-nav="reports">
+                    <div class="urgent-icon"><i class="fa-solid fa-flag"></i></div>
+                    <div class="urgent-info">
+                      <div class="urgent-title">{{ report_count }} User Reports</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-hdr">
+                <span class="card-title"><i class="fa-solid fa-users mr-1"></i> User Breakdown</span>
+              </div>
+              <div class="card-body">
+                <div class="grid grid-cols-3 gap-2.5">
+                  <div class="text-center p-2.5 bg-[rgba(59,130,246,.06)] rounded-lg">
+                    <div class="text-[10px] text-text-muted">Tenants</div>
+                    <div class="text-base font-bold text-blue">{{ tenant_count }}</div>
+                  </div>
+                  <div class="text-center p-2.5 bg-[rgba(16,185,129,.06)] rounded-lg">
+                    <div class="text-[10px] text-text-muted">Owners</div>
+                    <div class="text-base font-bold text-green">{{ owner_count }}</div>
+                  </div>
+                  <div class="text-center p-2.5 bg-[rgba(239,68,68,.06)] rounded-lg">
+                    <div class="text-[10px] text-text-muted">Suspended</div>
+                    <div class="text-base font-bold text-danger">{{ suspended_count }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div class="panel" id="panel-users">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">User Management</div>
+              <div class="section-sub">Manage tenants and owners</div>
+            </div>
+          </div>
+          <div class="user-tabs">
+            <div class="user-tab active" data-filter="all">All ({{ total_users }})</div>
+            <div class="user-tab" data-filter="tenant">Tenants ({{ tenant_count }})</div>
+            <div class="user-tab" data-filter="owner">Owners ({{ owner_count }})</div>
+            <div class="user-tab" data-filter="suspended">Suspended ({{ suspended_count }})</div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-wrap"><input class="search-input w-full" placeholder="Search by name, email..."></div>
+          </div>
+          <div class="card overflow-x-auto scrollbar">
+            <table class="data-table ">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Type</th>
+                  <th>City</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in users %}
+                <tr data-role="{{ user.role }}"
+                  data-status="{% if user.is_active %}active{% else %}suspended{% endif %}">
+                  <td>
+                    <div class="flex items-center gap-2">
+                      <div class="u-avatar bg-gradient-to-br from-primary to-blue">{{ user.first_name|first|upper }}
+                      </div>
+                      <div>
+                        <div class="text-xs font-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="text-[10px] text-text-muted">{{ user.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="tag {% if user.role == 'owner' %}green{% else %}blue{% endif %}">
+                      {{ user.role|title }}</span>
+                  </td>
+                  <td class="text-xs">{{ user.city|default:"—" }}</td>
+                  <td class="text-[11px] text-text-muted">{{ user.created_at|date:"M j, Y" }}</td>
+                  <td>
+                    {% if user.is_active %}
+                    <span class="tag green">Active</span>
+                    {% else %}
+                    <span class="tag red">Suspended</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'admin_toggle_user' user.user_id %}"
+                      class="btn btn-xs {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}"
+                      onclick="return confirm('{% if user.is_active %}Suspend{% else %}Activate{% endif %} this user?')">
+                      {% if user.is_active %}<i class="fa-solid fa-ban"></i> Suspend{% else %}<i
+                        class="fa-solid fa-check"></i> Activate{% endif %}
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-text-muted py-6">No users found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROPERTIES -->
+        <div class="panel" id="panel-properties">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">Property Verification</div>
+              <div class="section-sub">{{ pending_rooms }} pending review</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Unverified</button>
+            <button class="filter-btn">Verified</button>
+            <button class="filter-btn">Rejected</button>
+            <div class="search-wrap"><input class="search-input" placeholder="Search property..."></div>
+          </div>
+
+          {% for room in rooms %}
+          <div class="verif-card" data-status="{{ room.tag|lower }}">
+            <div class="verif-card-hdr">
+              <div class="verif-prop-thumb overflow-hidden">
+                {% if room.image %}
+                <img src="{{ room.image.url }}" alt="{{ room.room_name }}" class="w-full h-full object-cover">
+                {% else %}
+                <i class="fa-solid fa-building text-2xl text-blue"></i>
+                {% endif %}
+              </div>
+              <div class="verif-prop-info">
+                <div class="verif-prop-name">{{ room.room_name }} — {{ room.address }}</div>
+                <div class="verif-prop-meta">
+                  {% if room.owner %}{{ room.owner.first_name }} {{ room.owner.last_name }} • {% endif %}
+                  Rs. {{ room.price }}/mo • {{ room.beds }} Beds • {{ room.created_at|date:"M j, Y" }}
+                </div>
+                <div class="verif-prop-badges">
+                  <span
+                    class="tag {% if room.tag == 'Verified' %}green{% elif room.tag == 'Rejected' %}red{% else %}gold{% endif %}">
+                    {{ room.tag }}</span>
+                  {% if room.is_occupied %}<span class="tag blue">Occupied</span>{% endif %}
+                </div>
+              </div>
+            </div>
+            {% if room.description %}
+            <div class="verif-card-body">
+              <p class="text-xs text-text-secondary mb-2">{{ room.description|truncatewords:40 }}</p>
+              <div class="verif-actions">
+                {% if not room.is_verified %}
+                <a href="{% url 'admin_verify_room' room.id %}?action=approve" class="btn btn-success btn-sm"
+                  onclick="return confirm('Approve this property?')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </a>
+                {% endif %}
+                {% if room.tag != 'Rejected' and room.tag != 'Verified' %}
+                <a href="{% url 'admin_verify_room' room.id %}?action=reject" class="btn btn-danger btn-sm"
+                  onclick="return confirm('Reject this property?')">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </a>
+                {% endif %}
+                <a href="{% url 'admin_delete_room' room.id %}" class="btn btn-outline btn-sm"
+                  onclick="return confirm('Permanently delete this listing?')">
+                  <i class="fa-solid fa-trash"></i> Remove
+                </a>
+              </div>
+            </div>
+            {% else %}
+            <div class="verif-card-body">
+              <div class="verif-actions">
+                {% if not room.is_verified %}
+                <a href="{% url 'admin_verify_room' room.id %}?action=approve" class="btn btn-success btn-sm"
+                  onclick="return confirm('Approve this property?')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </a>
+                {% endif %}
+                {% if room.tag != 'Rejected' and room.tag != 'Verified' %}
+                <a href="{% url 'admin_verify_room' room.id %}?action=reject" class="btn btn-danger btn-sm"
+                  onclick="return confirm('Reject this property?')">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </a>
+                {% endif %}
+                <a href="{% url 'admin_delete_room' room.id %}" class="btn btn-outline btn-sm"
+                  onclick="return confirm('Permanently delete this listing?')">
+                  <i class="fa-solid fa-trash"></i> Remove
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% empty %}
+          <div class="card">
+            <div class="card-body text-center text-text-muted py-8">No properties listed yet.</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- BOOKINGS -->
+        <div class="panel" id="panel-bookings">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">Booking Management</div>
+              <div class="section-sub">{{ bookings.count }} total booking requests</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Pending</button>
+            <button class="filter-btn">Approved</button>
+            <button class="filter-btn">Rejected</button>
+            <div class="search-wrap"><input class="search-input" placeholder="Search tenant, property..."></div>
+          </div>
+          <div class="card overflow-x-auto scrollbar">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tenant</th>
+                  <th>Property</th>
+                  <th>Move-in</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in bookings %}
+                <tr>
+                  <td class="text-[11px] text-text-muted">#{{ booking.id }}</td>
+                  <td class="text-xs"><b>{{ booking.email }}</b></td>
+                  <td class="text-[11px]">{{ booking.room_id.room_name }}</td>
+                  <td class="text-[11px]">{{ booking.move_in_date|date:"M j, Y" }}</td>
+                  <td>
+                    <span
+                      class="tag {% if booking.status == 'Approved' %}green{% elif booking.status == 'Rejected' %}red{% else %}gold{% endif %}">
+                      {{ booking.status }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if booking.status == 'Pending' %}
+                    <div class="actions">
+                      <a href="{% url 'admin_update_booking' booking.id 'Approved' %}" class="btn btn-success btn-xs"
+                        onclick="return confirm('Approve this booking?')"><i class="fa-solid fa-check"></i></a>
+                      <a href="{% url 'admin_update_booking' booking.id 'Rejected' %}" class="btn btn-danger btn-xs"
+                        onclick="return confirm('Reject this booking?')"><i class="fa-solid fa-xmark"></i></a>
+                    </div>
+                    {% else %}
+                    <span class="text-[11px] text-text-muted">—</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-text-muted py-6">No bookings yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REPORTS -->
+        <div class="panel" id="panel-reports">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">Reports & Complaints</div>
+              <div class="section-sub">{{ report_count }} active reports</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-wrap"><input class="search-input" placeholder="Search reports..."></div>
+          </div>
+
+          {% for report in reports %}
+          <div class="report-card border-l-danger">
+            <div class="report-hdr">
+              <i class="fa-solid fa-flag text-base"></i>
+              <div class="report-title">{{ report.report_category|title }} — {{ report.room_id.room_name }}</div>
+              <span class="text-[11px] text-text-muted ml-auto">{{ report.created_at|timesince }} ago</span>
+            </div>
+            <div class="flex gap-3 mb-2 text-[11px] text-text-secondary">
+              <span><i class="fa-solid fa-user"></i> Reported by: <b>{{ report.user }}</b></span>
+              <span><i class="fa-solid fa-house"></i> {{ report.room_id.address }}</span>
+            </div>
+            <div class="report-body">{{ report.report_details }}</div>
+            <div class="report-actions">
+              <a href="{% url 'admin_delete_room' report.room_id.id %}" class="btn btn-danger btn-sm"
+                onclick="return confirm('Remove this listing?')">
+                <i class="fa-solid fa-trash"></i> Remove Listing
+              </a>
+              {% if report.room_id.owner and report.room_id.owner.is_active %}
+              <a href="{% url 'admin_toggle_user' report.room_id.owner.user_id %}" class="btn btn-warning btn-sm"
+                onclick="return confirm('Suspend the owner?')">
+                <i class="fa-solid fa-ban"></i> Suspend Owner
+              </a>
+              {% endif %}
+              <a href="{% url 'admin_dismiss_report' report.id %}" class="btn btn-outline btn-sm"
+                onclick="return confirm('Dismiss this report?')">
+                <i class="fa-solid fa-check"></i> Dismiss
+              </a>
+            </div>
+          </div>
+          {% empty %}
+          <div class="card">
+            <div class="card-body text-center text-text-muted py-8">No reports submitted.</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="panel" id="panel-reviews">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">Review Moderation</div>
+              <div class="section-sub">{{ reviews.count }} total reviews</div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-wrap"><input class="search-input" placeholder="Search reviews..."></div>
+          </div>
+
+          {% for review in reviews %}
+          <div class="review-mod-card">
+            <div class="review-mod-hdr">
+              <div class="review-mod-avatar"><i class="fa-solid fa-user text-blue"></i></div>
+              <div class="review-mod-info">
+                <div class="review-mod-name">{{ review.title }}</div>
+                <div class="review-mod-prop">{{ review.rating }}★ on: {{ review.property_id.room_name }}</div>
+              </div>
+              <div class="review-mod-stars">{{ review.rating }}★</div>
+            </div>
+            <div class="review-mod-text">{{ review.review }}</div>
+            <div class="review-mod-actions">
+              <a href="{% url 'admin_delete_review' review.id %}" class="btn btn-danger btn-sm"
+                onclick="return confirm('Remove this review?')">
+                <i class="fa-solid fa-trash"></i> Remove Review
+              </a>
+            </div>
+          </div>
+          {% empty %}
+          <div class="card">
+            <div class="card-body text-center text-text-muted py-8">No reviews yet.</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="panel" id="panel-notifications">
+          <div class="section-hdr">
+            <div>
+              <div class="section-title">Send Notification</div>
+              <div class="section-sub">Broadcast alerts to users</div>
+            </div>
+          </div>
+
+          <form action="{% url 'admin_send_notification' %}" method="POST" class="notif-compose">
+            {% csrf_token %}
+            <div class="notif-compose-title"><i class="fa-solid fa-bullhorn mr-1"></i> Compose Notification</div>
+            <div class="text-xs font-bold mb-2.5">Target Audience</div>
+            <div class="audience-grid mb-3">
+              <label class="audience-chip selected">
+                <input type="radio" name="audience" value="all" checked class="hidden">
+                <div class="audience-chip-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="audience-chip-label">All Users</div>
+              </label>
+              <label class="audience-chip">
+                <input type="radio" name="audience" value="tenants" class="hidden">
+                <div class="audience-chip-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <div class="audience-chip-label">Tenants</div>
+              </label>
+              <label class="audience-chip">
+                <input type="radio" name="audience" value="owners" class="hidden">
+                <div class="audience-chip-icon"><i class="fa-solid fa-house"></i></div>
+                <div class="audience-chip-label">Owners</div>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message</label>
+              <textarea name="message" class="form-textarea" placeholder="Write your notification message..."
+                required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">
+              <i class="fa-solid fa-paper-plane"></i> Send Notification
+            </button>
+          </form>
+
+          {% if notifications_sent %}
+          <div class="text-[13px] font-bold mb-3 mt-5"><i class="fa-solid fa-inbox mr-1"></i> Recently Sent</div>
+          <div class="sent-notif-list">
+            {% for notif in notifications_sent %}
+            <div class="sent-notif">
+              <div class="sent-notif-icon bg-[rgba(30,58,138,.1)]"><i
+                  class="fa-solid fa-bell text-primary text-base"></i></div>
+              <div class="sent-notif-info">
+                <div class="sent-notif-title">To: {{ notif.to_user.first_name }} {{ notif.to_user.last_name }}</div>
+                <div class="sent-notif-meta">{{ notif.message|truncatewords:12 }} • {{ notif.created_at|date:"M j, Y" }}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="{% static 'js/admin/admin.js' %}"></script>
+</body>
+
+</html>

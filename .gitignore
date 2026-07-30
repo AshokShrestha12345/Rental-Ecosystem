@@ -1,0 +1,24 @@
+# Environment files (VERY important)
+.env
+
+
+# Logs
+*.log
+
+
+# Large temp or unnecessary files
+*.tmp
+
+#Temp files
+temp.js
+
+js/pages/admin.js
+js/pages/owner.js
+
+pages/admin.html
+pages/owner.html
+
+venv__pycache__/
+
+__pycache__/
+*.pyc

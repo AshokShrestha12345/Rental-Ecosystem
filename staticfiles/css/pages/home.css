@@ -1,0 +1,72 @@
+@import url('../base/base.css');
+@import url('../components/hero-intro.css');
+@import url('../components/featured.css');
+@import url('../components/working.css');
+@import url('../components/find-home.css');
+@import url('../components/review.css');
+@import url('../components/footer.css');
+
+/* Background image + overlay */
+.hero-background {
+    position: relative;
+    background: radial-gradient(circle at 75% 50%, #1e3a8a 0%, #0f172a 100%);
+    overflow: hidden;
+}
+
+#hero-3d {
+    position: absolute;
+    top: 0;
+    right: -25%;
+    width: 50%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hero-background>*:not(canvas) {
+    position: relative;
+    z-index: 2;
+}
+
+/* Active nav link */
+.home-nav.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    position: relative;
+}
+
+.home-nav.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: #F59E0B;
+}
+
+/* Scrolled header state */
+header.scrolled {
+    background: rgba(10, 20, 50, 0.92);
+    backdrop-filter: blur(16px);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge pulse dot */
+.badge-dot {
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
