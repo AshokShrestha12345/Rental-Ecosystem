@@ -717,7 +717,13 @@
           <header class="section-header">
             <div>
               <h2 class="section-title">Notifications</h2>
-              <p class="section-subtitle">{{ unread_count }} unread notifications</p>
+              <p class="section-subtitle">
+                {% if unread_count > 0 %}
+                {{ unread_count }} unread notification{{ unread_count|pluralize }}
+                {% else %}
+                All caught up
+                {% endif %}
+              </p>
             </div>
             <button class="btn btn-outline btn-sm" id="mark-all-read-btn"><i class="fa-solid fa-check-double"></i> Mark
               all read</button>
@@ -725,7 +731,7 @@
           <div class="bg-surface rounded-[14px] border border-border overflow-hidden">
             <ul class="notif-list">
               {% for notification in notifications %}
-              <li class="notif-item {% if not notification.is_read %}unread{% endif %}">
+              <li class="notif-item {% if not notification.is_read %}unread{% endif %} {% if notification.is_read %}opacity-90{% endif %}">
                 <div class="notif-icon-wrap booking"><i class="fa-solid fa-bell"></i></div>
                 <div class="notif-content">
                   <strong class="notif-title">

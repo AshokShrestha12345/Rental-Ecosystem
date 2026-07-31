@@ -649,14 +649,25 @@
               <div class="section-header">
                 <div>
                   <div class="section-title">Notifications</div>
-                  <div class="section-subtitle">{{ unread_notifications_count }} unread notification
-                    {{ unread_notifications_count|pluralize }}</div>
+                  <div class="section-subtitle">
+                    {% if unread_notifications_count > 0 %}
+                    {{ unread_notifications_count }} unread notification{{ unread_notifications_count|pluralize }}
+                    {% else %}
+                    All caught up
+                    {% endif %}
+                  </div>
                 </div>
+                <form method="post" action="{% url 'notification' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline btn-sm" id="mark-all-read-btn">
+                    <i class="fa-solid fa-check-double"></i> Mark all read
+                  </button>
+                </form>
               </div>
               <div class="bg-surface rounded-[14px] border border-border overflow-hidden">
                 <div class="notif-list">
                   {% for notification in notifications %}
-                  <div class="notif-item {% if not notification.is_read %}unread{% endif %}">
+                  <div class="notif-item {% if not notification.is_read %}unread{% endif %} {% if notification.is_read %}opacity-90{% endif %}">
                     <div class="notif-icon-wrap booking"><i class="fa-solid fa-clipboard-list"></i></div>
                     <div class="notif-content">
                       <div class="notif-title">From: {{ notification.from_user.first_name }}

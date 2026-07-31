@@ -843,6 +843,7 @@
 }
 .notif-item:hover { background: var(--bg); }
 .notif-item.unread { background: rgba(59,130,246,.04); }
+.notif-item:not(.unread) { background: transparent; }
 
 .notif-item.unread::before {
   content: '';
