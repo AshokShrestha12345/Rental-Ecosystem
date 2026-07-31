@@ -506,38 +506,40 @@
           </div>
           <ul class="bookings-list">
             {% for booking in bookings %}
-            {% if booking.is_verified_by_admin and booking.is_verified_by_owner and booking.status == "Approved"%} <li
-              class="booking-card grid grid-col-1" data-status="{{ booking.status|lower }}">
+            {% if booking.is_verified_by_admin and booking.is_verified_by_owner and booking.status == "Approved" %}
+            <li class="booking-card" data-status="{{ booking.status|lower }}">
               <div class="booking-img" style="background:linear-gradient(135deg,#dbeafe,#93c5fd)">
                 <i class="fa-solid fa-building text-[28px] text-primary-light"></i>
               </div>
+
               <div class="booking-info">
-                <strong class="booking-name">{{ booking.room_id.room_name }}</strong>
-                <p class="booking-loc"><i class="fa-solid fa-location-dot"></i>
-                  {{ booking.room_id.city }} • Owner: {{ booking.room_id.owner.first_name }}
-                  {{ booking.room_id.owner.last_name }}</p>
-                <div class="booking-meta">
-                  <span class="booking-meta-item"><i class="fa-solid fa-calendar"></i> Visit: {{booking.preferred_date}}
+                <div class="booking-info-top">
+                  <strong class="booking-name">{{ booking.room_id.room_name }}</strong>
+                  <span class="status-badge {% if booking.status == 'Approved' %}approved{% elif booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
+                    <i class="fa-solid {% if booking.status == 'Approved' %}fa-circle-check{% elif booking.status == 'Rejected' %}fa-circle-xmark{% else %}fa-hourglass-half{% endif %}"></i>
+                    {{ booking.status }}
                   </span>
-                  <span class="booking-meta-item"><i class="fa-solid fa-money-bill"></i> Rs.
-                    {{booking.room_id.price}}/mo </span>
-                  <span class="booking-meta-item"><i class="fa-solid fa-clock"></i> Requested {{booking.created_at }}
-                    ago </span>
+                </div>
+
+                <p class="booking-loc">
+                  <i class="fa-solid fa-location-dot"></i>
+                  {{ booking.room_id.city }} • Owner: {{ booking.room_id.owner.first_name }} {{ booking.room_id.owner.last_name }}
+                </p>
+
+                <div class="booking-meta">
+                  <span class="booking-meta-item"><i class="fa-solid fa-calendar"></i> Visit: {{ booking.preferred_date }}</span>
+                  <span class="booking-meta-item"><i class="fa-solid fa-money-bill"></i> Rs. {{ booking.room_id.price }}/mo</span>
+                  <span class="booking-meta-item"><i class="fa-solid fa-clock"></i> Requested {{ booking.created_at }} ago</span>
                 </div>
               </div>
-              <span
-                class="status-badge text-center {% if booking.status == 'Approved' %}approved{% elif booking.status == 'Rejected' %}rejected{% else %}pending{% endif %}">
-                <i
-                  class="fa-solid  {% if booking.status == 'Approved' %}fa-circle-check{% elif booking.status == 'Rejected' %}fa-circle-xmark{% else %}fa-hourglass-half{% endif %}"></i>
-                {{ booking.status }}
-              </span>
-              <div class="flex flex-col gap-1.5 ml-2">
-                <button class="btn btn-danger btn-xs"><i class="fa-solid fa-xmark"></i></button>
-              </div>
+
+              <button class="btn btn-danger btn-xs booking-delete-btn" type="button">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </li>
             {% endif %}
             {% empty %}
-            <p class="text-center text-text-muted italic py-4">No bookings found.</p>
+            <li class="text-center text-text-muted italic py-4">No bookings found.</li>
             {% endfor %}
           </ul>
         </section>

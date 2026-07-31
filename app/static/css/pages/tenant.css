@@ -637,9 +637,10 @@
 ════════════════════════════ */
 .booking-form-card {
   background: var(--surface);
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
 }
 
 .booking-form-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
@@ -699,31 +700,59 @@
 
 .booking-card {
   background: var(--surface);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border);
-  padding: 16px 20px;
+  padding: 16px 18px;
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 14px;
   transition: all .2s;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
-.booking-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+.booking-card:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
 
 .booking-img {
   width: 64px;
   height: 64px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(30, 58, 138, 0.08);
 }
 
-.booking-info { flex: 1; }
-.booking-name { font-size: 15px; font-weight: 700; }
-.booking-loc  { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.booking-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-.booking-meta { display: flex; gap: 14px; }
+.booking-info-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.booking-name { font-size: 15px; font-weight: 700; }
+.booking-loc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.booking-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
 
 .booking-meta-item {
   font-size: 12px;
@@ -733,10 +762,41 @@
   gap: 4px;
 }
 
-.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 .status-badge.pending   { background: rgba(245,158,11,.1); color: var(--accent); }
 .status-badge.approved  { background: rgba(16,185,129,.1); color: var(--success); }
 .status-badge.rejected  { background: rgba(239,68,68,.1);  color: var(--danger); }
+
+.booking-delete-btn {
+  align-self: center;
+  margin-left: 4px;
+}
+
+@media (max-width: 640px) {
+  .booking-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .booking-info-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .booking-delete-btn {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}
 
 /* ════════════════════════════
    REVIEWS
