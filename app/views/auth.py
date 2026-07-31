@@ -85,6 +85,7 @@ def login(request):
 
         request.session['user_id'] = user.user_id
         request.session['user_role'] = user.role
+        
         if user.role == 'owner':
             return redirect('owner')
         elif user.role == 'tenant':
