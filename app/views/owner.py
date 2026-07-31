@@ -36,7 +36,9 @@ def owner(request):
         avg_rating = round(avg_rating, 1)
 
     # Get notifications
-    notifications = Notification.objects.filter(to_user=user_info, is_read=False).order_by('-created_at')
+    all_notifications = Notification.objects.filter(to_user=user_info).order_by('-created_at')
+    notifications = all_notifications.filter(is_read=False)
+    recent_activity = all_notifications[:5]
     unread_notifications_count = notifications.count()
 
     context = {
@@ -54,6 +56,7 @@ def owner(request):
         'review_count': review_count,
         'avg_rating': avg_rating,
         'notifications': notifications,
+        'recent_activity': recent_activity,
         'unread_notifications_count': unread_notifications_count,
     }
     return render(request, "pages/owner.html", context)

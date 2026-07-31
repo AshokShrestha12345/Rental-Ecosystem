@@ -221,7 +221,7 @@
                 </div>
                 <div class="card-body">
                   <div class="activity-list">
-                    {% for notification in notifications|slice:":5" %}
+                    {% for notification in recent_activity %}
                     <div class="activity-item">
                       <div class="activity-dot {% if notification.is_read %}blue{% else %}green{% endif %}"></div>
                       <div class="activity-text">{{ notification.message }}<span>{{ notification.from_user.first_name }}

@@ -232,7 +232,7 @@ class AuthFlowTests(TestCase):
         response = self.client.get(reverse('admin_panel'))
         self.assertContains(response, 'Owner approval left')
 
-    def test_read_notifications_are_hidden_from_dashboard(self):
+    def test_recent_activity_shows_latest_notifications_and_unread_panel_stays_filtered(self):
         owner = User.objects.create(
             first_name='Owner',
             last_name='User',
@@ -240,13 +240,13 @@ class AuthFlowTests(TestCase):
             password='hashed',
             role='owner',
         )
-        Notification.objects.create(
+        read_notification = Notification.objects.create(
             from_user=owner,
             to_user=owner,
             message='Already seen message',
             is_read=True,
         )
-        Notification.objects.create(
+        unread_notification = Notification.objects.create(
             from_user=owner,
             to_user=owner,
             message='New message',
@@ -260,8 +260,37 @@ class AuthFlowTests(TestCase):
 
         response = self.client.get(reverse('owner'))
 
-        self.assertContains(response, 'New message')
-        self.assertNotContains(response, 'Already seen message')
+        recent_messages = list(response.context['recent_activity'].values_list('message', flat=True))
+        unread_messages = list(response.context['notifications'].values_list('message', flat=True))
+
+        self.assertIn(read_notification.message, recent_messages)
+        self.assertIn(unread_notification.message, recent_messages)
+        self.assertEqual(unread_messages, [unread_notification.message])
+
+    def test_owner_dashboard_recent_activity_shows_latest_notifications(self):
+        owner = User.objects.create(
+            first_name='Owner',
+            last_name='User',
+            email='owner-activity@test.com',
+            password='hashed',
+            role='owner',
+        )
+        Notification.objects.create(
+            from_user=owner,
+            to_user=owner,
+            message='Latest booking update',
+            is_read=True,
+        )
+
+        session = self.client.session
+        session['user_id'] = str(owner.user_id)
+        session['user_role'] = owner.role
+        session.save()
+
+        response = self.client.get(reverse('owner'))
+
+        self.assertContains(response, 'Latest booking update')
+        self.assertNotContains(response, 'No recent activity yet.')
 
     def test_owner_dashboard_pending_count_only_includes_admin_approved_requests(self):
         owner = User.objects.create(
