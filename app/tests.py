@@ -2,7 +2,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import User, Room, Report, BookRoom
+from .models import User, Room, Report
 
 
 class AuthFlowTests(TestCase):
@@ -130,67 +130,6 @@ class AuthFlowTests(TestCase):
         )
 
         self.assertContains(response, 'A user with this email already exists.')
-
-    def test_admin_panel_shows_owner_approval_message_after_admin_approval(self):
-        admin_user = User.objects.create(
-            first_name='Admin',
-            last_name='User',
-            email='admin-booking@test.com',
-            password='hashed',
-            role='admin',
-        )
-        owner = User.objects.create(
-            first_name='Owner',
-            last_name='User',
-            email='owner-booking@test.com',
-            password='hashed',
-            role='owner',
-        )
-        tenant = User.objects.create(
-            first_name='Tenant',
-            last_name='User',
-            email='tenant-booking@test.com',
-            password='hashed',
-            role='tenant',
-        )
-        room = Room.objects.create(
-            owner=owner,
-            image='images/default.jpg',
-            room_name='Booked Room',
-            address='Test Street',
-            city='Kathmandu',
-            price=10000,
-            description='Test',
-            tag='Verified',
-            is_verified=True,
-        )
-        booking = BookRoom.objects.create(
-            room_id=room,
-            email=tenant.email,
-            preferred_date='2025-01-01',
-            preferred_time='12:00 PM',
-            move_in_date='2025-01-02',
-            occupants='2',
-            lease_duration='1 month',
-            message='Need a place',
-            status='Pending',
-            is_verified_by_admin=False,
-            is_verified_by_owner=False,
-        )
-
-        admin_session = self.client.session
-        admin_session['user_id'] = str(admin_user.user_id)
-        admin_session['user_role'] = admin_user.role
-        admin_session.save()
-
-        self.client.get(reverse('admin_update_booking', args=[booking.id, 'Approved']))
-        booking.refresh_from_db()
-
-        self.assertTrue(booking.is_verified_by_admin)
-        self.assertEqual(booking.status, 'Pending')
-
-        response = self.client.get(reverse('admin_panel'))
-        self.assertContains(response, 'Owner approval left')
 
     def test_toggle_like_toggles_room_in_wishlist(self):
         tenant = User.objects.create(

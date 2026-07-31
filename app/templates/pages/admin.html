@@ -411,27 +411,13 @@
                     </span>
                   </td>
                   <td>
-                    {% if booking.status == 'Pending' and not booking.is_verified_by_admin %}
+                    {% if booking.status == 'Pending' %}
                     <div class="actions">
                       <a href="{% url 'admin_update_booking' booking.id 'Approved' %}" class="btn btn-success btn-xs"
                         onclick="return confirm('Approve this booking?')"><i class="fa-solid fa-check"></i></a>
                       <a href="{% url 'admin_update_booking' booking.id 'Rejected' %}" class="btn btn-danger btn-xs"
                         onclick="return confirm('Reject this booking?')"><i class="fa-solid fa-xmark"></i></a>
                     </div>
-
-                    {% elif booking.is_verified_by_admin and not booking.is_verified_by_owner and booking.status == 'Pending' %}
-                    <div class="actions">
-                      <span class="text-[11px] text-text-muted">Owner approval left</span>
-                    </div>
-
-                    {% elif booking.status == 'Approved' %}
-                    <span class="text-[11px] text-green-600 font-medium">Approved by owner</span>
-
-                    {% elif booking.status == 'Rejected' %}
-                    <span class="text-[11px] text-danger font-medium">
-                      {% if booking.is_verified_by_admin %}Rejected by owner{% else %}Rejected by admin{% endif %}
-                    </span>
-
                     {% else %}
                     <span class="text-[11px] text-text-muted">—</span>
                     {% endif %}
