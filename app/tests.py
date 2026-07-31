@@ -232,6 +232,93 @@ class AuthFlowTests(TestCase):
         response = self.client.get(reverse('admin_panel'))
         self.assertContains(response, 'Owner approval left')
 
+    def test_read_notifications_are_hidden_from_dashboard(self):
+        owner = User.objects.create(
+            first_name='Owner',
+            last_name='User',
+            email='owner-hide@test.com',
+            password='hashed',
+            role='owner',
+        )
+        Notification.objects.create(
+            from_user=owner,
+            to_user=owner,
+            message='Already seen message',
+            is_read=True,
+        )
+        Notification.objects.create(
+            from_user=owner,
+            to_user=owner,
+            message='New message',
+            is_read=False,
+        )
+
+        session = self.client.session
+        session['user_id'] = str(owner.user_id)
+        session['user_role'] = owner.role
+        session.save()
+
+        response = self.client.get(reverse('owner'))
+
+        self.assertContains(response, 'New message')
+        self.assertNotContains(response, 'Already seen message')
+
+    def test_owner_dashboard_pending_count_only_includes_admin_approved_requests(self):
+        owner = User.objects.create(
+            first_name='Owner',
+            last_name='User',
+            email='owner-count@test.com',
+            password='hashed',
+            role='owner',
+        )
+        room = Room.objects.create(
+            owner=owner,
+            image='images/default.jpg',
+            room_name='Count Room',
+            address='Test Street',
+            city='Kathmandu',
+            price=10000,
+            description='Test',
+            tag='Verified',
+            is_verified=True,
+        )
+        BookRoom.objects.create(
+            room_id=room,
+            email='tenant1@test.com',
+            preferred_date='2025-01-01',
+            preferred_time='12:00 PM',
+            move_in_date='2025-01-02',
+            occupants='2',
+            lease_duration='1 month',
+            message='Pending owner review',
+            status='Pending',
+            is_verified_by_admin=True,
+            is_verified_by_owner=False,
+        )
+        BookRoom.objects.create(
+            room_id=room,
+            email='tenant2@test.com',
+            preferred_date='2025-01-03',
+            preferred_time='1:00 PM',
+            move_in_date='2025-01-04',
+            occupants='1',
+            lease_duration='2 months',
+            message='Waiting for admin approval',
+            status='Pending',
+            is_verified_by_admin=False,
+            is_verified_by_owner=False,
+        )
+
+        session = self.client.session
+        session['user_id'] = str(owner.user_id)
+        session['user_role'] = owner.role
+        session.save()
+
+        response = self.client.get(reverse('owner'))
+
+        self.assertContains(response, '1 pending request')
+        self.assertContains(response, 'Pending (1)')
+
     def test_owner_notifications_mark_all_read_and_redirect_back_to_owner(self):
         owner = User.objects.create(
             first_name='Owner',

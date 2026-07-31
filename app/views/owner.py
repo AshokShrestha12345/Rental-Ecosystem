@@ -19,7 +19,11 @@ def owner(request):
 
     # Get booking requests for the owner's rooms
     bookings = BookRoom.objects.filter(room_id__in=rooms).order_by('-created_at')
-    pending_bookings_count = bookings.filter(status='Pending').count()
+    owner_review_bookings = bookings.filter(is_verified_by_admin=True)
+    visible_bookings_count = owner_review_bookings.count()
+    pending_bookings_count = owner_review_bookings.filter(status='Pending').count()
+    approved_bookings_count = owner_review_bookings.filter(status='Approved').count()
+    rejected_bookings_count = owner_review_bookings.filter(status='Rejected').count()
 
     # Get reviews for the owner's rooms
     reviews = Review.objects.filter(property_id__in=rooms).order_by('-created_at')
@@ -32,8 +36,8 @@ def owner(request):
         avg_rating = round(avg_rating, 1)
 
     # Get notifications
-    notifications = Notification.objects.filter(to_user=user_info).order_by('-created_at')
-    unread_notifications_count = notifications.filter(is_read=False).count()
+    notifications = Notification.objects.filter(to_user=user_info, is_read=False).order_by('-created_at')
+    unread_notifications_count = notifications.count()
 
     context = {
         'user_info': user_info,
@@ -43,6 +47,9 @@ def owner(request):
         'booked_properties': booked_properties,
         'bookings': bookings,
         'pending_bookings_count': pending_bookings_count,
+        'visible_bookings_count': visible_bookings_count,
+        'approved_bookings_count': approved_bookings_count,
+        'rejected_bookings_count': rejected_bookings_count,
         'reviews': reviews,
         'review_count': review_count,
         'avg_rating': avg_rating,

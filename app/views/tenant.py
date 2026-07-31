@@ -18,8 +18,8 @@ def tenant(request):
             room.liked = room.id in liked_room_ids
     reviews = Review.objects.all().order_by('-created_at')
     bookings = BookRoom.objects.filter(email=user_info.email).order_by('-created_at') if user_info else []
-    notifications = Notification.objects.filter(to_user=user_info).order_by('-created_at') if user_info else []
-    unread_count = notifications.filter(is_read=False).count() if user_info else 0
+    notifications = Notification.objects.filter(to_user=user_info, is_read=False).order_by('-created_at') if user_info else []
+    unread_count = len(notifications) if user_info else 0
     
     return render(request, "pages/tenant.html", {
         'rooms': rooms,

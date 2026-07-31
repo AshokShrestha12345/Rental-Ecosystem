@@ -34,15 +34,23 @@ const navItems = [
 
 function buildSidebar() {
     if (!navContainer) return;
+
+    const unreadCount = Number(navContainer.dataset.unreadCount || 0);
     let html = '';
+
     for (let category of navItems) {
         html += `<p class="nav-label">${category.category}</p>`;
         for (let item of category.items) {
             const activeClass = item.isActive ? 'active' : '';
+            const badgeHtml = item.panel === 'notifications' && unreadCount > 0
+                ? `<span class="nav-badge">${unreadCount}</span>`
+                : '';
+
             html += `
                 <button class="nav-item ${activeClass} w-full text-left" data-panel="${item.panel}">
                     <i class="${item.icon} nav-icon"></i>
                     <span>${item.label}</span>
+                    ${badgeHtml}
                 </button>
             `;
         }
@@ -387,6 +395,8 @@ function initNotificationBell() {
                 navigateTo("notifications");
                 const dot = this.querySelector(".notif-dot");
                 if (dot) dot.style.display = "none";
+                const sidebarBadge = document.querySelector('.nav-item[data-panel="notifications"] .nav-badge');
+                if (sidebarBadge) sidebarBadge.remove();
             }
         });
     }
@@ -403,6 +413,13 @@ function initMarkAllRead() {
                 const dot = item.querySelector(".notif-dot-badge");
                 if (dot) dot.style.display = "none";
             });
+
+            const bellDot = document.querySelector('.notif-btn .notif-dot');
+            if (bellDot) bellDot.style.display = 'none';
+
+            const sidebarBadge = document.querySelector('.nav-item[data-panel="notifications"] .nav-badge');
+            if (sidebarBadge) sidebarBadge.remove();
+
             const header = document.querySelector('#panel-notifications .section-subtitle');
             if (header) header.textContent = "0 unread notifications";
             showToast("✅ All notifications marked as read", "success");

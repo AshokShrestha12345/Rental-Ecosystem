@@ -435,49 +435,52 @@
             </div>
           </div>
           <div class="filter-bar ">
-            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn active" data-filter="all">All ({{ visible_bookings_count }})</button>
             <button class="filter-btn" data-filter="Pending">Pending ({{ pending_bookings_count }})</button>
-            <button class="filter-btn" data-filter="Approved">Accepted</button>
-            <button class="filter-btn" data-filter="Rejected">Rejected</button>
+            <button class="filter-btn" data-filter="Approved">Accepted ({{ approved_bookings_count }})</button>
+            <button class="filter-btn" data-filter="Rejected">Rejected ({{ rejected_bookings_count }})</button>
           </div>
           <div class="bookings-list">
 
             {% for booking in bookings %}
             {% if booking.is_verified_by_admin %}
-            <div class="booking-card flex flex-col md:flex-row " data-status="{{ booking.status }}">
+            <div class="booking-card" data-status="{{ booking.status }}">
               <div class="booking-avatar"><i class="fa-solid fa-user"></i></div>
-              <div class="booking-info text-center">
-                <div class="booking-name">{{ booking.email }}</div>
-                <div class="booking-prop"><i class="fa-solid fa-house"></i> {{ booking.room_id.room_name }} —
-                  {{ booking.room_id.city }} • Move-in: {{ booking.move_in_date|date:"M d, Y" }}</div>
-                <div class="booking-meta md:w-full text-center ">
+
+              <div class="booking-info">
+                <div class="booking-info-top">
+                  <div>
+                    <div class="booking-name">{{ booking.email }}</div>
+                    <div class="booking-prop">
+                      <i class="fa-solid fa-house"></i> {{ booking.room_id.room_name }} — {{ booking.room_id.city }} • Move-in: {{ booking.move_in_date|date:"M d, Y" }}
+                    </div>
+                  </div>
+                  <div class="booking-status {% if booking.status == 'Pending' %}pending{% elif booking.status == 'Approved' %}accepted{% elif booking.status == 'Rejected' %}rejected{% endif %}">
+                    {% if booking.status == 'Pending' %}
+                    <i class="fa-solid fa-hourglass-half"></i> Pending
+                    {% elif booking.status == 'Approved' %}
+                    <i class="fa-solid fa-circle-check"></i> Accepted
+                    {% elif booking.status == 'Rejected' %}
+                    <i class="fa-solid fa-xmark"></i> Rejected
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="booking-meta">
                   <div class="booking-meta-item"><i class="fa-solid fa-users"></i> {{ booking.occupants }}</div>
                   <div class="booking-meta-item"><i class="fa-solid fa-calendar"></i> {{ booking.lease_duration }}</div>
-                  <div class="booking-meta-item"><i class="fa-solid fa-clock"></i> {{ booking.created_at|timesince }}
-                    ago</div>
+                  <div class="booking-meta-item"><i class="fa-solid fa-clock"></i> {{ booking.created_at|timesince }} ago</div>
                 </div>
               </div>
-              <div
-                class="booking-status text-center w-full md:w-auto {% if booking.status == 'Pending' %}pending{% elif booking.status == 'Approved' %}accepted{% elif booking.status == 'Rejected' %}rejected{% endif %}">
+
+              <div class="booking-actions">
                 {% if booking.status == 'Pending' %}
-                <i class="fa-solid fa-hourglass-half"></i> Pending
-                {% elif booking.status == 'Approved' %}
-                <i class="fa-solid fa-circle-check"></i> Accepted
-                {% elif booking.status == 'Rejected' %}
-                <i class="fa-solid fa-xmark"></i> Rejected
-                {% endif %}
-              </div>
-              <div class="booking-actions  bg-red text-center">
-                {% if booking.status == 'Pending' %}
-                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-success btn-sm"><i
-                    class="fa-solid fa-check"></i> Accept</a>
-                <a href="{% url 'update_booking_status' booking.id 'Rejected' %}" class="btn btn-danger btn-sm"><i
-                    class="fa-solid fa-xmark"></i> Reject</a>
+                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i> Accept</a>
+                <a href="{% url 'update_booking_status' booking.id 'Rejected' %}" class="btn btn-danger btn-sm"><i class="fa-solid fa-xmark"></i> Reject</a>
                 {% elif booking.status == 'Approved' %}
                 <span class="text-xs text-text-muted"><i class="fa-solid fa-check-double"></i> Approved</span>
                 {% elif booking.status == 'Rejected' %}
-                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-outline btn-sm"><i
-                    class="fa-solid fa-rotate-left"></i> Reconsider</a>
+                <a href="{% url 'update_booking_status' booking.id 'Approved' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-rotate-left"></i> Reconsider</a>
                 {% endif %}
               </div>
             </div>
